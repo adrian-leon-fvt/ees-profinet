@@ -9,7 +9,9 @@
    └───────▲─────────────────────┬─────┘
            │ FrameView           │ Bytes payload
    ┌───────┴─────────────────────▼─────┐
-   │ profinet::Stack   (stack.h)       │  socket, receive loop, dispatch
+   │ profinet::Stack   (stack.h)       │  optional: socket, receive loop, send
+   ├───────────────────────────────────┤
+   │ Dispatcher        (dispatcher.h)  │  hooks, feed(raw) → dispatch, no I/O
    ├───────────────────────────────────┤
    │ parse / build     (frame.h)       │  pure functions, no I/O
    └───────▲─────────────────────┬─────┘
@@ -17,13 +19,29 @@
    ════════╧═════════ NIC ═══════╧═════
 ```
 
-Two layers:
+Three layers:
 
 - **`frame.h`**: pure functions. No sockets, no state. Use it alone to
   decode frames from pcap files or other sources, or to build frames for
   tests.
-- **`stack.h`**: `profinet::Stack` owns one raw socket bound to one
-  interface. Receives frames, parses them with `frame.h`, and calls your hooks.
+- **`dispatcher.h`**: `profinet::Dispatcher` holds your hooks. `feed(raw)`
+  parses one frame and calls the matching hooks. No socket.
+- **`stack.h`**: `profinet::Stack` is a `Dispatcher` plus a raw socket on one
+  interface: receive loop, VLAN recovery, multicast joins, `send()`.
+
+### Who owns the socket
+
+Socket management is optional. Pick one:
+
+| Mode | Code | Library does | You do |
+|---|---|---|---|
+| Library-managed | `Stack stack("eth0");` | Open, configure, bind, join DCP/LLDP multicast, receive, send, close | Register hooks, call `run()`/`poll()` |
+| Your fd, library loop | `Stack stack(fd, mac, ifindex, fd_ownership_t::BORROW);` | Receive loop, send; closes the fd only with `OWN` | Open/configure the socket (PACKET_AUXDATA, multicast) |
+| Fully yours | `Dispatcher d; ... d.feed(raw, vlan);` | Parse + hooks | All I/O: socket / pcap / XDP / replay, sending (`build()`) |
+
+With `feed()`, pass the out-of-band VLAN tag if your NIC strips it
+(PACKET_AUXDATA, pcap metadata); otherwise `FrameView::vlan` is only set for
+in-band tags.
 
 Beside them, **`rpc.h`** handles connection management (CM) over UDP; see
 [RPC](concepts.md#rpc-connection-management). It shares only `Bytes` with the layer-2 code.

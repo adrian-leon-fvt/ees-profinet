@@ -21,6 +21,7 @@ namespace pn = profinet;
 - [VLAN tagging](cookbook.md#vlan-tagging)
 - [Several interfaces](cookbook.md#several-interfaces)
 - [Decode frames without a socket](cookbook.md#decode-frames-without-a-socket)
+- [Feed hooks from your own socket](cookbook.md#feed-hooks-from-your-own-socket)
 
 ## Clean shutdown on Ctrl-C
 
@@ -461,5 +462,44 @@ bool is_dcp_identify(const std::vector<std::uint8_t> &captured)
 {
     const auto f = profinet::parse(captured);
     return f && f->frame_id == profinet::frame_id::k_dcp_identify_req;
+}
+```
+
+## Feed hooks from your own socket
+
+Keep the socket (or pcap handle, XDP ring, ...) in your code and use only
+the hook dispatch. `Dispatcher` has no I/O and needs no privileges.
+
+```cpp
+#include "profinet/dispatcher.h"
+
+#include <sys/socket.h>
+
+void pump(int my_fd, const pn::Dispatcher &hooks)
+{
+    std::uint8_t buf[2048];
+    for (;;)
+    {
+        const ssize_t n = ::recv(my_fd, buf, sizeof(buf), 0);
+        if (n <= 0)
+        {
+            break;
+        }
+        hooks.feed(pn::Bytes(buf, static_cast<std::size_t>(n)));
+        // NIC strips VLAN tags? read PACKET_AUXDATA via recvmsg() and pass
+        // feed(raw, pn::Vlan{pcp, vid}).
+    }
+}
+```
+
+To keep the library's receive loop but your own socket, hand the fd to
+`Stack` without giving it away:
+
+```cpp
+void run_on(int my_fd, const pn::Mac &mac, int ifindex)
+{
+    pn::Stack stack(my_fd, mac, ifindex, pn::fd_ownership_t::BORROW);
+    stack.on_any([](const pn::FrameView &) { /* ... */ });
+    stack.run(); // my_fd stays open after stack is destroyed
 }
 ```

@@ -2,7 +2,8 @@
 
 Linux PROFINET layer-2 library: raw `AF_PACKET` socket, frame parsing
 (Ethernet/802.1Q/FrameID, RT APDU status, DCP header, LLDP) and FrameID-based
-hooks, plus a UDP RPC transport for connection management (`profinet/rpc.h`).
+hooks. Socket management is optional: `Dispatcher::feed()` runs the hooks on
+frames from your own socket or capture. Plus a UDP RPC transport for connection management (`profinet/rpc.h`).
 CM state machines, alarms and the IO-device state machine are left to the application.
 
 ## Build

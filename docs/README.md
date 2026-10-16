@@ -18,7 +18,7 @@ application also gets helpers to build and send frames.
 
 | Included | Not included (build on top with hooks) |
 |---|---|
-| Raw `AF_PACKET` socket bound to one interface | CM state machines (AR/IOCR setup, PrmEnd/ApplicationReady sequencing) |
+| Raw `AF_PACKET` socket bound to one interface (optional: `Dispatcher::feed()` or a borrowed fd for your own I/O) | CM state machines (AR/IOCR setup, PrmEnd/ApplicationReady sequencing) |
 | RPC transport: DCE/RPC CL header, NDR wrapper, PNIO block framing, UDP endpoint (34964 / 49152+) | PNIO block content decoding, DCE/RPC fragmentation and retransmission |
 | DCP + LLDP multicast group membership | MRP, SNMP |
 | LLDP parse/build, hooks for any EtherType | Periodic LLDP transmission (call `build_lldp` from a timer) |

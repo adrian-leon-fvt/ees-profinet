@@ -5,10 +5,11 @@
 ```
 test/
 ├── unit/                     GoogleTest, no privileges, no network
+│   ├── test_dispatcher.cpp   feed(): hook matching, VLAN override, runts
 │   ├── test_frame.cpp        parse/build/APDU/DCP
 │   ├── test_lldp.cpp         LLDP TLV parse/build
 │   ├── test_rpc.cpp          DCE/RPC header (LE + hand-encoded BE), NDR, blocks, UDP request/reply on 127.0.0.1
-│   └── test_stack.cpp        hook dispatch, poll/run/stop (socketpair)
+│   └── test_stack.cpp        receive loop, poll/run/stop, fd ownership (socketpair)
 └── integration/
     ├── profinet_loopback.cpp manual test app: TX on one interface, RX on another
     └── loopback_netns.sh     runs it over a veth pair in a user netns (ctest)
@@ -75,9 +76,10 @@ filters) next to it to inspect the frames.
 
 ## Testing your own hooks
 
-Don't open a real interface in unit tests. Subclass `Stack` to reach the
-protected fd-adopting constructor and feed frames through a `socketpair`.
-The whole receive path runs as in production: `poll()`, parsing, dispatch.
+Don't open a real interface in unit tests. Give `Stack` one end of a
+`socketpair`; the whole receive path runs as in production: `poll()`,
+parsing, dispatch. If you only need the hooks, skip the socket and call
+`profinet::Dispatcher::feed()` with bytes from `profinet::build()`.
 
 ```cpp
 #include "profinet/stack.h"
@@ -86,20 +88,11 @@ The whole receive path runs as in production: `poll()`, parsing, dispatch.
 #include <sys/socket.h>
 #include <unistd.h>
 
-namespace
-{
-class FakeStack : public profinet::Stack
-{
-  public:
-    explicit FakeStack(int fd) : Stack(fd, {0x02, 0, 0, 0, 0, 1}, 1) {}
-};
-} // namespace
-
 TEST(MyApp, ReactsToDcpIdentify)
 {
     int fds[2];
     ASSERT_EQ(::socketpair(AF_UNIX, SOCK_DGRAM, 0, fds), 0);
-    FakeStack stack(fds[0]); // owns fds[0]
+    profinet::Stack stack(fds[0], {0x02, 0, 0, 0, 0, 1}, 1); // owns fds[0]
     bool seen = false;
     stack.on(profinet::frame_id::k_dcp_identify_req, [&](const auto &) { seen = true; });
 
@@ -115,7 +108,7 @@ TEST(MyApp, ReactsToDcpIdentify)
 }
 ```
 
-What you send from the fake stack (`send()`) arrives on `fds[1]`; read it
+What you send from the stack (`send()`) arrives on `fds[1]`; read it
 with `recv()` to check your replies.
 
 For pure parsing logic, skip the socket and call `profinet::parse()` on
