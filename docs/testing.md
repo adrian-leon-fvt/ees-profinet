@@ -37,11 +37,15 @@ sudo build/profinet_loopback <tx_if> <rx_if>
 
 Sends a class-1 RT frame (unicast to `rx_if`'s MAC) and a DCP Identify
 (multicast) out of `tx_if`, and checks that hooks on `rx_if` receive both
-with intact headers, APDU status and payload length.
+with intact headers, APDU status and payload length. It also checks
+`/proc/net/dev_mcast` to confirm `rx_if` joined the DCP multicast group
+(a veth pair delivers multicast even without joining, so receipt alone
+doesn't prove it).
 
 ```
 RT  : PASS
 DCP : PASS
+MCAST: PASS
 ```
 
 | Exit code | Meaning |

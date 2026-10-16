@@ -46,6 +46,14 @@ class Stack
     void on_any(Hook hook);
 
     /**
+     * @brief Ask the NIC to deliver frames sent to multicast MAC @p group.
+     * @note The constructor already joins k_multicast_dcp. Membership lasts
+     *       until the Stack is destroyed.
+     * @throws std::system_error on failure.
+     */
+    void join_multicast(const Mac &group);
+
+    /**
      * @brief Wait up to @p timeout_ms for frames and dispatch them.
      * @return Number of PROFINET frames dispatched.
      */

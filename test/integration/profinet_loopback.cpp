@@ -11,6 +11,26 @@
 
 #include <cstdio>
 #include <exception>
+#include <fstream>
+#include <string>
+
+namespace
+{
+/** @return true if the kernel lists @p mac in @p ifname's multicast filter. */
+bool in_dev_mcast(const std::string &ifname, const std::string &mac)
+{
+    std::ifstream in("/proc/net/dev_mcast");
+    std::string idx, name, refs, global, addr;
+    while (in >> idx >> name >> refs >> global >> addr)
+    {
+        if (name == ifname && addr == mac)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+} // namespace
 
 int main(const int argc, char **argv)
 {
@@ -56,10 +76,13 @@ int main(const int argc, char **argv)
             rx.poll(100);
         }
 
-        std::printf("RT  : %s\nDCP : %s\n",
+        const bool mcast_ok = in_dev_mcast(argv[2], "010ecf000000");
+
+        std::printf("RT  : %s\nDCP : %s\nMCAST: %s\n",
                     rt_ok ? "PASS" : "FAIL",
-                    dcp_ok ? "PASS" : "FAIL");
-        return rt_ok && dcp_ok ? 0 : 1;
+                    dcp_ok ? "PASS" : "FAIL",
+                    mcast_ok ? "PASS" : "FAIL");
+        return rt_ok && dcp_ok && mcast_ok ? 0 : 1;
     }
     catch (const std::exception &e)
     {

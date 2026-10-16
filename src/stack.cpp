@@ -68,6 +68,7 @@ Stack::Stack(const std::string &interface_name)
         {
             fail("bind");
         }
+        join_multicast(k_multicast_dcp);
     }
     catch (...)
     {
@@ -88,6 +89,19 @@ Stack::Stack(const int fd, const Mac &mac, const int ifindex)
 Stack::~Stack()
 {
     ::close(fd_);
+}
+
+void Stack::join_multicast(const Mac &group)
+{
+    packet_mreq mr{};
+    mr.mr_ifindex = ifindex_;
+    mr.mr_type = PACKET_MR_MULTICAST;
+    mr.mr_alen = 6;
+    std::copy(group.begin(), group.end(), mr.mr_address);
+    if (::setsockopt(fd_, SOL_PACKET, PACKET_ADD_MEMBERSHIP, &mr, sizeof(mr)) < 0)
+    {
+        fail("PACKET_ADD_MEMBERSHIP");
+    }
 }
 
 void Stack::on(const std::uint16_t first, const std::uint16_t last, Hook hook)

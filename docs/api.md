@@ -64,6 +64,7 @@ Note: with hardware VLAN offload, `vlan` is set but `raw` contains no tag.
 |---|---|
 | `k_ethertype` | `0x8892` |
 | `k_ethertype_vlan` | `0x8100` |
+| `k_multicast_dcp` | `01:0E:CF:00:00:00` (DCP Identify / Hello) |
 | `frame_id::*` | See [concepts.md#frameid-ranges](concepts.md#frameid-ranges) |
 
 ## Functions (`frame.h`)
@@ -112,9 +113,10 @@ Owns one `AF_PACKET` socket bound to one interface. Not copyable or movable.
 
 ### `explicit Stack(const std::string &interface_name)`
 Opens the socket, looks up the interface index and MAC, enables VLAN
-recovery, and binds.
+recovery, binds, and joins the DCP multicast group.
 **Throws** `std::system_error` (with `errno`) naming the failed step:
-`socket`, `SIOCGIFINDEX`, `SIOCGIFHWADDR`, `PACKET_AUXDATA`, `bind`.
+`socket`, `SIOCGIFINDEX`, `SIOCGIFHWADDR`, `PACKET_AUXDATA`, `bind`,
+`PACKET_ADD_MEMBERSHIP`.
 Needs `CAP_NET_RAW`.
 
 ### `virtual ~Stack()`
@@ -157,6 +159,13 @@ destination MAC on (≥ 14 bytes; pad to 60 yourself).
 
 ### `const Mac &mac() const`
 MAC address of the bound interface, read once at construction.
+
+### `void join_multicast(const Mac &group)`
+Adds @p group to the interface's multicast filter so the NIC delivers frames
+sent to it. The constructor already joins `k_multicast_dcp`. Membership is
+dropped automatically when the `Stack` is destroyed. Joining the same group
+twice is harmless.
+**Throws** `std::system_error` (`PACKET_ADD_MEMBERSHIP`).
 
 ### `int fd() const`
 The socket descriptor, for an external `epoll`/`select` loop. Don't read

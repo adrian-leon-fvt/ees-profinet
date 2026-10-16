@@ -9,6 +9,7 @@
 | Compile error about `std::span` | App not built as C++20 | Link via `profinet::profinet` in CMake (sets C++20), or pass `-std=c++20` |
 | No hooks fire | Hook range doesn't contain the FrameID | Register `on_any` with a `printf` to see what arrives |
 | No hooks fire, `tcpdump` shows frames | `poll()`/`run()` never called, or called on another `Stack` | Make sure the loop runs on the `Stack` the hooks are on |
+| DCP Identify-All not received, unicast works | Multicast filtered (group not joined on this interface, or switch IGMP/multicast filtering) | `Stack` joins `01:0E:CF:00:00:00` automatically; check with `ip maddr show dev <if>`. For other groups call `join_multicast()` |
 | No frames at all | Wrong port, switch filtering, or traffic not addressed to this host | Check with `tcpdump -i <if> -e ether proto 0x8892`. For unicast frames to other MACs, enable promiscuous mode: `sudo ip link set <if> promisc on` |
 | Own transmitted frames not seen | By design: outgoing frames are dropped | Use a second interface (see [testing.md](testing.md)) |
 | `f.vlan` set but no tag in `f.raw` | NIC stripped the tag (VLAN offload); recovered from kernel metadata | Expected. Disable with `ethtool -K <if> rxvlan off` if you need it in-band |

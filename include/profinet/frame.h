@@ -20,6 +20,9 @@ using Bytes = std::span<const std::uint8_t>;
 constexpr std::uint16_t k_ethertype = 0x8892;
 constexpr std::uint16_t k_ethertype_vlan = 0x8100;
 
+/** @brief DCP Identify / Hello multicast address. */
+constexpr Mac k_multicast_dcp{0x01, 0x0E, 0xCF, 0x00, 0x00, 0x00};
+
 /** @brief Well-known FrameID values and ranges (IEC 61158-6-10). */
 namespace frame_id
 {

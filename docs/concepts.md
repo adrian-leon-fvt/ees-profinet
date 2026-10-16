@@ -76,6 +76,14 @@ Constants are in `profinet::frame_id`.
 | `0xFEFE` | DCP Identify request (multicast `01:0E:CF:00:00:00`) | `is_dcp` |
 | `0xFEFF` | DCP Identify response | `is_dcp` |
 
+## Multicast
+
+Network cards drop multicast frames for groups nobody has joined. `Stack`
+joins `01:0E:CF:00:00:00` (DCP Identify / Hello) when it is constructed, so a
+device sees Identify-All requests from engineering tools. Join other groups
+(e.g. multicast cyclic data) with `join_multicast()`. To receive *all*
+multicast while debugging: `sudo ip link set <if> allmulticast on`.
+
 ## Receive path
 
 `Stack::poll(timeout_ms)`:
