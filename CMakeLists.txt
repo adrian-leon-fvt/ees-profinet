@@ -36,6 +36,13 @@ option(PROFINET_BUILD_TESTS "Build unit tests and loopback test app" ${PROJECT_I
 if(PROFINET_BUILD_EXAMPLES AND PROFINET_POSIX)
     add_executable(pn_sniff examples/pn_sniff.cpp)
     target_link_libraries(pn_sniff PRIVATE profinet)
+    add_executable(pn_borrowed_fd examples/pn_borrowed_fd.cpp)
+    target_link_libraries(pn_borrowed_fd PRIVATE profinet)
+endif()
+# Uses only portable library parts; its own I/O is Linux, so host-only.
+if(PROFINET_BUILD_EXAMPLES AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_executable(pn_dispatcher examples/pn_dispatcher.cpp)
+    target_link_libraries(pn_dispatcher PRIVATE profinet)
 endif()
 
 if(PROFINET_BUILD_TESTS)

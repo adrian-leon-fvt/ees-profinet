@@ -503,3 +503,7 @@ void run_on(int my_fd, const pn::Mac &mac, int ifindex)
     stack.run(); // my_fd stays open after stack is destroyed
 }
 ```
+
+Complete programs: [`examples/pn_dispatcher.cpp`](../examples/pn_dispatcher.cpp)
+(feed) and [`examples/pn_borrowed_fd.cpp`](../examples/pn_borrowed_fd.cpp)
+(borrowed fd).

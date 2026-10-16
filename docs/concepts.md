@@ -39,6 +39,10 @@ Socket management is optional. Pick one:
 | Your fd, library loop | `Stack stack(fd, mac, ifindex, fd_ownership_t::BORROW);` | Receive loop, send; closes the fd only with `OWN` | Open/configure the socket (PACKET_AUXDATA, multicast) |
 | Fully yours | `Dispatcher d; ... d.feed(raw, vlan);` | Parse + hooks | All I/O: socket / pcap / XDP / replay, sending (`build()`) |
 
+Runnable examples: `examples/pn_sniff.cpp` (library-managed),
+`examples/pn_borrowed_fd.cpp` (your fd), `examples/pn_dispatcher.cpp`
+(fully yours; builds with the `portable` preset).
+
 With `feed()`, pass the out-of-band VLAN tag if your NIC strips it
 (PACKET_AUXDATA, pcap metadata); otherwise `FrameView::vlan` is only set for
 in-band tags.

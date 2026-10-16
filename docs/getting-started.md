@@ -43,7 +43,7 @@ so also pass `-DPROFINET_BUILD_TESTS=OFF` there).
 | `PROFINET_POSIX` | `ON` | `ON` | `OFF` drops `stack.cpp`, `rpc_endpoint.cpp`, POSIX tests and examples, and doesn't install `stack.h`. Library then has no OS dependency. |
 | `PROFINET_BUILD_TESTS` | `ON` | `OFF` | GoogleTest unit tests, `profinet_loopback`, ctest entries |
 | `PROFINET_E2E_PYTHON` | `python3` | `python3` | Interpreter with profinet-py + pytest for the `e2e` ctest ([testing.md](testing.md)) |
-| `PROFINET_BUILD_EXAMPLES` | `ON` | `OFF` | `pn_sniff` example |
+| `PROFINET_BUILD_EXAMPLES` | `ON` | `OFF` | `pn_sniff`, `pn_borrowed_fd`, `pn_dispatcher` examples |
 | `PROFINET_BUILD_DOCS` | `ON` | `OFF` | `docs` target (Doxygen HTML in `build/html/`; needs Doxygen, skipped if missing). Undocumented public API fails it. |
 | `BUILD_SHARED_LIBS` | `OFF` | inherited | Build `libprofinet.so` instead of `.a` |
 
@@ -114,6 +114,14 @@ A complete version that also sends a DCP Identify-All request is in
 ```sh
 sudo build/pn_sniff eth0
 ```
+
+Same Identify-All, for the other socket-ownership modes
+([concepts.md](concepts.md#who-owns-the-socket)):
+
+| Example | Mode | Builds with |
+|---|---|---|
+| [`pn_borrowed_fd.cpp`](../examples/pn_borrowed_fd.cpp) | Your fd, library loop: `Stack(fd, mac, ifindex, BORROW)` | `linux` |
+| [`pn_dispatcher.cpp`](../examples/pn_dispatcher.cpp) | Fully yours: `Dispatcher::feed()` + `build()`; I/O in `eth_open/eth_rx/eth_tx`, swap those for an MCU driver | `linux` and `portable` |
 
 ## Next
 
