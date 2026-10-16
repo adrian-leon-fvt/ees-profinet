@@ -105,50 +105,6 @@ void Stack::join_multicast(const Mac &group)
     }
 }
 
-void Stack::on(const std::uint16_t first, const std::uint16_t last, Hook hook)
-{
-    hooks_.push_back({first, last, std::move(hook)});
-}
-
-void Stack::on(const std::uint16_t id, Hook hook)
-{
-    on(id, id, std::move(hook));
-}
-
-void Stack::on_any(Hook hook)
-{
-    on(0x0000, 0xFFFF, std::move(hook));
-}
-
-void Stack::on_ethertype(const std::uint16_t ethertype, Hook hook)
-{
-    ethertype_hooks_.emplace_back(ethertype, std::move(hook));
-}
-
-bool Stack::dispatch(const FrameView &frame) const
-{
-    bool matched = frame.ethertype == k_ethertype;
-    if (matched)
-    {
-        for (const Entry &e : hooks_)
-        {
-            if (frame.frame_id >= e.first && frame.frame_id <= e.last)
-            {
-                e.hook(frame);
-            }
-        }
-    }
-    for (const auto &[type, hook] : ethertype_hooks_)
-    {
-        if (type == frame.ethertype)
-        {
-            hook(frame);
-            matched = true;
-        }
-    }
-    return matched;
-}
-
 int Stack::poll(const int timeout_ms)
 {
     pollfd pfd{fd_, POLLIN, 0};
@@ -195,16 +151,7 @@ int Stack::poll(const int timeout_ms)
             continue;
         }
 
-        const Bytes bytes(buf, static_cast<std::size_t>(n));
-        auto frame = parse(bytes);
-        if (!frame)
-        {
-            frame = parse_ethernet(bytes);
-            if (!frame || frame->ethertype == k_ethertype)
-            {
-                continue; // runt or truncated PROFINET frame
-            }
-        }
+        std::optional<Vlan> vlan;
         for (cmsghdr *c = CMSG_FIRSTHDR(&msg); c; c = CMSG_NXTHDR(&msg, c))
         {
             if (c->cmsg_level != SOL_PACKET || c->cmsg_type != PACKET_AUXDATA)
@@ -215,12 +162,12 @@ int Stack::poll(const int timeout_ms)
             std::memcpy(&aux, CMSG_DATA(c), sizeof(aux));
             if (aux.tp_status & TP_STATUS_VLAN_VALID)
             {
-                frame->vlan = Vlan{
+                vlan = Vlan{
                     static_cast<std::uint8_t>(aux.tp_vlan_tci >> 13),
                     static_cast<std::uint16_t>(aux.tp_vlan_tci & 0x0FFF)};
             }
         }
-        handled += dispatch(*frame);
+        handled += feed(Bytes(buf, static_cast<std::size_t>(n)), vlan);
     }
     return handled;
 }

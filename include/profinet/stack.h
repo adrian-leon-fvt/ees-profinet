@@ -5,28 +5,23 @@
 #ifndef PROFINET_STACK_H
 #define PROFINET_STACK_H
 
+#include "profinet/dispatcher.h"
 #include "profinet/frame.h"
 #include "profinet/lldp.h"
 
 #include <atomic>
-#include <functional>
 #include <string>
-#include <utility>
-#include <vector>
 
 namespace profinet
 {
 
-/** @brief Callback invoked for each received frame matching its range. */
-using Hook = std::function<void(const FrameView &)>;
-
 /**
- * @brief Binds an AF_PACKET socket to one interface, receives PROFINET
- *        frames and dispatches them to registered hooks.
+ * @brief Binds an AF_PACKET socket to one interface, receives frames and
+ *        feeds them to the inherited Dispatcher hooks.
  * @note Needs CAP_NET_RAW. Register hooks before calling poll()/run();
  *       hook registration is not thread-safe.
  */
-class Stack
+class Stack : public Dispatcher
 {
   public:
     /**
@@ -42,31 +37,6 @@ class Stack
     virtual ~Stack();
     Stack(const Stack &) = delete;
     Stack &operator=(const Stack &) = delete;
-
-    /**
-     * @name Hook registration
-     * `on` / `on_any` see PROFINET (0x8892) frames only. Every matching hook
-     * runs, in registration order. No removal: check a flag in the hook.
-     */
-    ///@{
-
-    /** @brief Call @p hook for frames with FrameID in [first, last]. */
-    void on(std::uint16_t first, std::uint16_t last, Hook hook);
-
-    /** @brief Call @p hook for frames with exactly FrameID @p id. */
-    void on(std::uint16_t id, Hook hook);
-
-    /** @brief Call @p hook for every PROFINET frame. */
-    void on_any(Hook hook);
-
-    /**
-     * @brief Call @p hook for every frame with EtherType @p ethertype
-     *        (e.g. k_ethertype_lldp). FrameView::payload starts after the
-     *        EtherType and frame_id is 0. For 0x8892 the view is the
-     *        PROFINET one (payload after FrameID).
-     */
-    void on_ethertype(std::uint16_t ethertype, Hook hook);
-    ///@}
 
     /**
      * @brief Ask the NIC to deliver frames sent to multicast MAC @p group.
@@ -149,27 +119,11 @@ class Stack
      */
     Stack(int fd, const Mac &mac, int ifindex);
 
-    /**
-     * @brief Run matching hooks for one frame. Call it to inject frames
-     *        from other sources (pcap replay, simulation).
-     * @return true if the frame is PROFINET or matched an EtherType hook.
-     */
-    bool dispatch(const FrameView &frame) const;
-
   private:
-    struct Entry
-    {
-        std::uint16_t first;
-        std::uint16_t last;
-        Hook hook;
-    };
-
     int fd_ = -1;
     int ifindex_ = 0;
     bool connected_ = false; ///< Adopted non-AF_PACKET socket: plain send().
     Mac mac_{};
-    std::vector<Entry> hooks_;
-    std::vector<std::pair<std::uint16_t, Hook>> ethertype_hooks_;
     std::atomic<bool> running_{false};
 };
 
