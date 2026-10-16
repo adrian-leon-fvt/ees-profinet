@@ -44,3 +44,23 @@ if(PROFINET_BUILD_TESTS)
     include(GoogleTest)
     gtest_discover_tests(profinet_test PROPERTIES LABELS unit TIMEOUT 5)
 endif()
+
+option(PROFINET_BUILD_DOCS "Build Doxygen API docs (target: docs)" ${PROJECT_IS_TOP_LEVEL})
+if(PROFINET_BUILD_DOCS)
+    find_package(Doxygen)
+    if(DOXYGEN_FOUND)
+        set(DOXYGEN_PROJECT_NAME "ees-profinet")
+        set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ${CMAKE_CURRENT_SOURCE_DIR}/docs/README.md)
+        set(DOXYGEN_EXTRACT_ALL NO)
+        set(DOXYGEN_WARN_IF_UNDOCUMENTED YES)
+        set(DOXYGEN_WARN_NO_PARAMDOC NO)
+        set(DOXYGEN_WARN_AS_ERROR YES)
+        set(DOXYGEN_EXCLUDE_SYMBOLS "detail")
+        set(DOXYGEN_GENERATE_TREEVIEW YES)
+        set(DOXYGEN_DISTRIBUTE_GROUP_DOC YES)
+        doxygen_add_docs(docs
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/docs
+            COMMENT "Generating API docs")
+    endif()
+endif()
