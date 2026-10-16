@@ -35,6 +35,7 @@ class Bytes
     /** @brief Marker for "to the end" in subspan(). */
     static constexpr std::size_t npos = static_cast<std::size_t>(-1);
 
+    /** @brief Empty view. */
     constexpr Bytes() noexcept = default;
     /** @brief View @p size bytes starting at @p data. */
     constexpr Bytes(const std::uint8_t *data, std::size_t size) noexcept
@@ -58,10 +59,15 @@ class Bytes
     {
     }
 
+    /** @brief First byte (nullptr if default-constructed). */
     constexpr const std::uint8_t *data() const noexcept { return data_; }
+    /** @brief Number of bytes. */
     constexpr std::size_t size() const noexcept { return size_; }
+    /** @brief True if size() == 0. */
     constexpr bool empty() const noexcept { return size_ == 0; }
+    /** @brief Iterator to first byte. */
     constexpr const std::uint8_t *begin() const noexcept { return data_; }
+    /** @brief Iterator past last byte. */
     constexpr const std::uint8_t *end() const noexcept { return data_ + size_; }
     /** @brief Unchecked element access. */
     constexpr const std::uint8_t &operator[](std::size_t i) const noexcept

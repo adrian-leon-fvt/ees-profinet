@@ -1,6 +1,9 @@
 /**
  * @file stack.h
  * @brief PROFINET raw-socket endpoint with FrameID-based hook dispatch.
+ *
+ * Linux only (AF_PACKET): not built or installed with PROFINET_POSIX=OFF.
+ * On other platforms feed received frames into profinet::Dispatcher.
  */
 #ifndef PROFINET_STACK_H
 #define PROFINET_STACK_H

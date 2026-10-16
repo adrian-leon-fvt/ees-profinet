@@ -246,7 +246,8 @@ using RpcHook = std::function<void(const RpcPacket &, const Ipv4Endpoint &from)>
 /**
  * @brief UDP socket speaking PNIO RPC, with opnum-based hook dispatch.
  * @note Register hooks before poll()/run(); registration is not thread-safe.
- *       No privileges needed.
+ *       No privileges needed. POSIX only: not built with PROFINET_POSIX=OFF;
+ *       use the codec functions above with your own UDP stack instead.
  */
 class RpcEndpoint
 {

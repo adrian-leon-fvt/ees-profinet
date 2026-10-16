@@ -18,10 +18,25 @@ cmake --build build -j
 ctest --test-dir build          # optional
 ```
 
+Or with presets (CMake 3.21+):
+
+| Preset | Builds | Use for |
+|---|---|---|
+| `linux` | everything: codecs, `Dispatcher`, `Stack`, `RpcEndpoint`, examples | Linux hosts |
+| `portable` | codecs + `Dispatcher` only (`PROFINET_POSIX=OFF`) | MCU / RTOS targets (e.g. IAR + lwIP); you supply frame RX/TX and UDP |
+
+```sh
+cmake --preset portable && cmake --build --preset portable && ctest --preset portable
+```
+
+For a cross toolchain add `-DCMAKE_TOOLCHAIN_FILE=...` (tests need GoogleTest,
+so also pass `-DPROFINET_BUILD_TESTS=OFF` there).
+
 ### CMake options
 
 | Option | Default (top-level) | Default (`add_subdirectory`) | Effect |
 |---|---|---|---|
+| `PROFINET_POSIX` | `ON` | `ON` | `OFF` drops `stack.cpp`, `rpc_endpoint.cpp`, POSIX tests and examples, and doesn't install `stack.h`. Library then has no OS dependency. |
 | `PROFINET_BUILD_TESTS` | `ON` | `OFF` | GoogleTest unit tests, `profinet_loopback`, ctest entries |
 | `PROFINET_BUILD_EXAMPLES` | `ON` | `OFF` | `pn_sniff` example |
 | `PROFINET_BUILD_DOCS` | `ON` | `OFF` | `docs` target (Doxygen HTML in `build/html/`; needs Doxygen, skipped if missing). Undocumented public API fails it. |

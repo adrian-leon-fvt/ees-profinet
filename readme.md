@@ -16,6 +16,9 @@ sudo cmake --install build   # optional
 Options (default ON when top-level, OFF when added via `add_subdirectory`):
 `PROFINET_BUILD_TESTS`, `PROFINET_BUILD_EXAMPLES`.
 
+Presets: `cmake --preset linux` (full) or `cmake --preset portable`
+(`PROFINET_POSIX=OFF`: codecs + `Dispatcher`, no OS I/O, for MCU/RTOS).
+
 ## Test
 
 - `ctest --test-dir build -L unit` — GoogleTest, no privileges needed.

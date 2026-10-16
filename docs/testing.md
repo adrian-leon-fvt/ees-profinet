@@ -8,15 +8,17 @@ test/
 │   ├── test_dispatcher.cpp   feed(): hook matching, VLAN override, runts
 │   ├── test_frame.cpp        parse/build/APDU/DCP
 │   ├── test_lldp.cpp         LLDP TLV parse/build
-│   ├── test_rpc.cpp          DCE/RPC header (LE + hand-encoded BE), NDR, blocks, UDP request/reply on 127.0.0.1
-│   └── test_stack.cpp        receive loop, poll/run/stop, fd ownership (socketpair)
+│   ├── test_rpc.cpp          DCE/RPC header (LE + hand-encoded BE), NDR, blocks
+│   ├── test_rpc_endpoint.cpp UDP request/reply on 127.0.0.1 (POSIX only)
+│   └── test_stack.cpp        receive loop, poll/run/stop, fd ownership (socketpair; POSIX only)
 └── integration/
     ├── profinet_loopback.cpp manual test app: TX on one interface, RX on another
     └── loopback_netns.sh     runs it over a veth pair in a user netns (ctest)
 ```
 
 All of it is built only when `PROFINET_BUILD_TESTS=ON` (default when this
-repo is the top-level project).
+repo is the top-level project). With `PROFINET_POSIX=OFF` (preset `portable`)
+only the codec/dispatcher unit tests are built.
 
 ## Running
 
