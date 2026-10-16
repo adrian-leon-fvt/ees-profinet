@@ -20,6 +20,7 @@ Options (default ON when top-level, OFF when added via `add_subdirectory`):
 - `ctest --test-dir build -L unit` — GoogleTest, no privileges needed.
 - `ctest --test-dir build -L integration` — runs `profinet_loopback` over a
   veth pair in an unprivileged netns; skipped if user namespaces are off.
+- `cmake --build build --target docs` — Doxygen HTML; fails on undocumented public API (also run in CI).
 - Manual, on real hardware: `sudo build/profinet_loopback <tx_if> <rx_if>`
   with the two interfaces linked. Exit 0 = pass.
 
