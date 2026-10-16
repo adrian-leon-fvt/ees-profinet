@@ -3,9 +3,10 @@
 ## Requirements
 
 - Linux (uses `AF_PACKET`, `PACKET_AUXDATA`).
-- C++20 compiler (GCC 10+, Clang 12+). Public headers use `std::span`, so
-  your application must also compile as C++20. The CMake target sets this
-  for you (`cxx_std_20` is a public compile feature).
+- C++17 compiler (GCC 8+, Clang 7+). Matches embedded toolchains such as
+  IAR 9. The CMake target sets this for you (`cxx_std_17` is a public
+  compile feature). `profinet::Bytes` is a minimal C++17 stand-in for
+  `std::span<const std::uint8_t>`.
 - CMake 3.16+.
 - GoogleTest only when building the tests (`libgtest-dev`).
 
@@ -52,7 +53,7 @@ target_link_libraries(my_app PRIVATE profinet::profinet)
 ### Option C: without CMake
 
 ```sh
-g++ -std=c++20 -I/usr/local/include main.cpp -L/usr/local/lib -lprofinet -o my_app
+g++ -std=c++17 -I/usr/local/include main.cpp -L/usr/local/lib -lprofinet -o my_app
 ```
 
 ## Permissions

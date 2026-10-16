@@ -6,7 +6,7 @@
 | `SIOCGIFINDEX: No such device` | Wrong interface name | Check `ip link` |
 | `sendto: Network is down` | Interface is down | `sudo ip link set <if> up` |
 | `sendto: Message too long` | Frame larger than MTU | Keep payload ≤ 1496 bytes (1492 with VLAN) |
-| Compile error about `std::span` | App not built as C++20 | Link via `profinet::profinet` in CMake (sets C++20), or pass `-std=c++20` |
+| Compile errors in `profinet/*.h` | App built below C++17 | Link via `profinet::profinet` in CMake (sets C++17), or pass `-std=c++17` |
 | LLDP hook never fires | Linux bridge or `lldpd` in the path, or the switch consumes LLDP | Connect directly; LLDP is link-local and not forwarded by switches |
 | No hooks fire | Hook range doesn't contain the FrameID | Register `on_any` with a `printf` to see what arrives |
 | No hooks fire, `tcpdump` shows frames | `poll()`/`run()` never called, or called on another `Stack` | Make sure the loop runs on the `Stack` the hooks are on |

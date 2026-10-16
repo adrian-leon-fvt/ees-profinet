@@ -1,15 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 project(profinet VERSION 0.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(profinet src/dispatcher.cpp src/frame.cpp src/lldp.cpp src/rpc.cpp src/stack.cpp)
 add_library(profinet::profinet ALIAS profinet)
 target_include_directories(profinet PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
-target_compile_features(profinet PUBLIC cxx_std_20)
+target_compile_features(profinet PUBLIC cxx_std_17)
 target_compile_options(profinet PRIVATE -Wall -Wextra)
 
 include(GNUInstallDirs)

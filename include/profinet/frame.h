@@ -9,9 +9,9 @@
 #define PROFINET_FRAME_H
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <optional>
-#include <span>
 #include <vector>
 
 namespace profinet
@@ -27,7 +27,60 @@ using Mac = std::array<std::uint8_t, 6>;
  * `std::array<std::uint8_t, N>` and `std::uint8_t[N]`; use
  * `Bytes(ptr, len)` for a pointer + length.
  */
-using Bytes = std::span<const std::uint8_t>;
+// ponytail: C++17 subset of std::span<const uint8_t>; swap for std::span
+// once all targets have C++20.
+class Bytes
+{
+  public:
+    /** @brief Marker for "to the end" in subspan(). */
+    static constexpr std::size_t npos = static_cast<std::size_t>(-1);
+
+    constexpr Bytes() noexcept = default;
+    /** @brief View @p size bytes starting at @p data. */
+    constexpr Bytes(const std::uint8_t *data, std::size_t size) noexcept
+        : data_(data), size_(size)
+    {
+    }
+    /** @brief View a C array. */
+    template <std::size_t N>
+    constexpr Bytes(const std::uint8_t (&a)[N]) noexcept : data_(a), size_(N)
+    {
+    }
+    /** @brief View a std::array. */
+    template <std::size_t N>
+    constexpr Bytes(const std::array<std::uint8_t, N> &a) noexcept
+        : data_(a.data()), size_(N)
+    {
+    }
+    /** @brief View a vector (must outlive the view). */
+    Bytes(const std::vector<std::uint8_t> &v) noexcept
+        : data_(v.data()), size_(v.size())
+    {
+    }
+
+    constexpr const std::uint8_t *data() const noexcept { return data_; }
+    constexpr std::size_t size() const noexcept { return size_; }
+    constexpr bool empty() const noexcept { return size_ == 0; }
+    constexpr const std::uint8_t *begin() const noexcept { return data_; }
+    constexpr const std::uint8_t *end() const noexcept { return data_ + size_; }
+    /** @brief Unchecked element access. */
+    constexpr const std::uint8_t &operator[](std::size_t i) const noexcept
+    {
+        return data_[i];
+    }
+    /** @brief First @p n bytes (unchecked, like std::span). */
+    constexpr Bytes first(std::size_t n) const noexcept { return {data_, n}; }
+    /** @brief @p n bytes from @p offset; npos = to the end (unchecked). */
+    constexpr Bytes subspan(std::size_t offset, std::size_t n = npos) const
+        noexcept
+    {
+        return {data_ + offset, n == npos ? size_ - offset : n};
+    }
+
+  private:
+    const std::uint8_t *data_ = nullptr;
+    std::size_t size_ = 0;
+};
 
 /** @brief PROFINET EtherType. */
 constexpr std::uint16_t k_ethertype = 0x8892;

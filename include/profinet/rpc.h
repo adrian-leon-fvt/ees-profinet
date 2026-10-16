@@ -184,7 +184,12 @@ struct Ipv4Endpoint
     std::array<std::uint8_t, 4> ip{}; ///< Network order, e.g. {192,168,0,10}.
     std::uint16_t port = k_rpc_port;  ///< Host order.
     /** @brief Equal if ip and port match. */
-    bool operator==(const Ipv4Endpoint &) const = default;
+    bool operator==(const Ipv4Endpoint &o) const
+    {
+        return ip == o.ip && port == o.port;
+    }
+    /** @brief Negation of operator==. */
+    bool operator!=(const Ipv4Endpoint &o) const { return !(*this == o); }
 };
 
 /** @brief PNIO object UUID DEA00000-6C97-11D1-8271-IIII-DDDD-VVVV. */
