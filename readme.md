@@ -1,8 +1,9 @@
 # An EES implementation of profinet
 
 Linux PROFINET layer-2 library: raw `AF_PACKET` socket, frame parsing
-(Ethernet/802.1Q/FrameID, RT APDU status, DCP header) and FrameID-based hooks.
-CM/RPC, alarms and the IO-device state machine are left to the application.
+(Ethernet/802.1Q/FrameID, RT APDU status, DCP header, LLDP) and FrameID-based
+hooks, plus a UDP RPC transport for connection management (`profinet/rpc.h`).
+CM state machines, alarms and the IO-device state machine are left to the application.
 
 ## Build
 

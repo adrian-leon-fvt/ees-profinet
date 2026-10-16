@@ -25,6 +25,9 @@ Two layers:
 - **`stack.h`**: `profinet::Stack` owns one raw socket bound to one
   interface. Receives frames, parses them with `frame.h`, and calls your hooks.
 
+Beside them, **`rpc.h`** handles connection management (CM) over UDP; see
+[RPC](#rpc-connection-management). It shares only `Bytes` with the layer-2 code.
+
 ## Frame layout
 
 ```
@@ -159,6 +162,32 @@ std::vector<std::uint8_t> keep(f.raw.begin(), f.raw.end());
 `stop()` *before* `run()` has no effect, because `run()` resets the flag
 when it starts.
 
+## RPC (connection management)
+
+Connect, Release, Read, Write and Control (PrmEnd, ApplicationReady) travel
+as DCE/RPC connectionless datagrams over UDP/IP, not as raw frames:
+
+```
+UDP payload:
+| RPC header (80) | NDR wrapper (20) | PNIO block | PNIO block | ...
+  drep byte order   drep byte order    big-endian: type(2) length(2) ver(1) ver(1) content
+```
+
+- **Ports.** Devices listen on `34964`. The side that *initiates* a call
+  uses an ephemeral port (49152–65535): the controller for Connect/Write/
+  PrmEnd, the device for ApplicationReady. `RpcEndpoint(0)` picks one.
+- **drep.** The 4th header byte says whether integers in the header and NDR
+  wrapper are little- or big-endian. `parse_rpc` accepts both; `build_rpc`
+  always sends little-endian. UUIDs are stored canonically in `Uuid`.
+- **Matching.** A response copies `activity`, `sequence`, `opnum`, `object`
+  and `interface` from the request (`make_response`). Use `activity` +
+  `sequence` to pair responses with requests on the client side.
+- **What the library does not do.** No AR/CR state machine, no block
+  content decoding beyond the block header, no DCE/RPC fragmentation, no
+  retransmission, ping or ack handling. Your hooks decide what a Connect
+  means and build the response blocks. See the open-source p-net stack for
+  a full reference implementation of the CM state machines.
+
 ## Limits
 
 - One interface per `Stack`. Create several `Stack` objects for several ports.
@@ -167,3 +196,5 @@ when it starts.
   frames) and filters in user space. On very busy links, add a BPF filter on
   `fd()` if CPU load matters.
 - No send rate control or cycle timing. Your application decides when to send.
+- RPC: one datagram per call (no DCE/RPC fragmentation); bodies above
+  ~1400 bytes rely on IP fragmentation.
