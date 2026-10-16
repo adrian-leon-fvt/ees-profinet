@@ -16,6 +16,8 @@ namespace pn = profinet;
 - [Integrate with your own epoll loop](#integrate-with-your-own-epoll-loop)
 - [Hand frames to a worker thread](#hand-frames-to-a-worker-thread)
 - [Send and receive LLDP](#send-and-receive-lldp)
+- [Answer RPC Connect (device side)](#answer-rpc-connect-device-side)
+- [Send an RPC request (controller side)](#send-an-rpc-request-controller-side)
 - [VLAN tagging](#vlan-tagging)
 - [Several interfaces](#several-interfaces)
 - [Decode frames without a socket](#decode-frames-without-a-socket)
@@ -330,6 +332,90 @@ void lldp_announce(pn::Stack &stack, const std::string &name_of_station)
 ```
 
 Other EtherTypes work the same way with `on_ethertype(0x88E3, ...)` (MRP) etc.
+
+## Answer RPC Connect (device side)
+
+`RpcEndpoint` handles the UDP socket and DCE/RPC framing; your hook decides
+what the blocks mean. Block content layouts are in IEC 61158-6-10.
+
+```cpp
+#include "profinet/rpc.h"
+
+void serve_connect(pn::RpcEndpoint &ep) // pn::RpcEndpoint ep(pn::k_rpc_port);
+{
+    ep.on(pn::pnio_opnum::k_connect, [&](const pn::RpcPacket &p, const pn::Ipv4Endpoint &from) {
+        if (p.header.ptype != pn::rpc_ptype::k_request)
+        {
+            return;
+        }
+        const auto req = pn::parse_ndr_request(p);
+        const auto blocks = req ? pn::parse_blocks(req->args) : std::nullopt;
+        if (!blocks)
+        {
+            return;
+        }
+        std::vector<std::uint8_t> out;
+        for (const auto &b : *blocks)
+        {
+            if (b.type == pn::pnio_block::k_ar_block_req)
+            {
+                std::vector<std::uint8_t> ar_res; // decode b.content, fill ARBlockRes
+                pn::append_block(out, b.type | pn::pnio_block::k_response_bit, ar_res);
+            }
+        }
+        ep.reply(p, from, pn::build_ndr_response(pn::k_pnio_ok, req->args_maximum, out));
+    });
+    ep.run();
+}
+```
+
+## Send an RPC request (controller side)
+
+Requests go out from an ephemeral port; match the response on `activity`.
+
+```cpp
+#include "profinet/rpc.h"
+
+#include <arpa/inet.h>
+#include <random>
+
+std::optional<std::vector<std::uint8_t>> rpc_read(
+    const std::string &device_ip, std::uint16_t vendor_id, std::uint16_t device_id,
+    pn::Bytes read_blocks)
+{
+    pn::RpcEndpoint ep(0); // first free port in 49152-65535
+    pn::Ipv4Endpoint to;   // port defaults to 34964
+    if (inet_pton(AF_INET, device_ip.c_str(), to.ip.data()) != 1)
+    {
+        return std::nullopt;
+    }
+    pn::RpcHeader h;
+    h.object = pn::make_pnio_object_uuid(1, device_id, vendor_id);
+    h.interface = pn::rpc_interface::k_device;
+    h.opnum = pn::pnio_opnum::k_read;
+    std::random_device rd;
+    for (auto &b : h.activity)
+    {
+        b = static_cast<std::uint8_t>(rd());
+    }
+
+    std::optional<std::vector<std::uint8_t>> result;
+    ep.on(pn::pnio_opnum::k_read, [&](const pn::RpcPacket &p, const pn::Ipv4Endpoint &) {
+        const auto rsp = pn::parse_ndr_response(p);
+        if (p.header.ptype == pn::rpc_ptype::k_response && p.header.activity == h.activity &&
+            rsp && rsp->status == pn::k_pnio_ok)
+        {
+            result.emplace(rsp->args.begin(), rsp->args.end()); // copy: span dies after hook
+        }
+    });
+    ep.send(to, h, pn::build_ndr_request(4096, read_blocks));
+    for (int i = 0; i < 10 && !result; ++i) // ~1 s timeout, no retransmission
+    {
+        ep.poll(100);
+    }
+    return result;
+}
+```
 
 ## VLAN tagging
 
