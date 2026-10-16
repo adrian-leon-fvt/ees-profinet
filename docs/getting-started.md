@@ -29,6 +29,10 @@ Or with presets (CMake 3.21+):
 cmake --preset portable && cmake --build --preset portable && ctest --preset portable
 ```
 
+Presets export `compile_commands.json`; `.clangd` points clangd at
+`build/linux` (run `cmake --preset linux` once). Edit `.clangd` to
+`build/portable` to see what an MCU build compiles.
+
 For a cross toolchain add `-DCMAKE_TOOLCHAIN_FILE=...` (tests need GoogleTest,
 so also pass `-DPROFINET_BUILD_TESTS=OFF` there).
 

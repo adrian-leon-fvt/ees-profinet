@@ -1,26 +1,61 @@
 {
     "version": 3,
-    "cmakeMinimumRequired": {"major": 3, "minor": 21, "patch": 0},
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21,
+        "patch": 0
+    },
     "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
         {
             "name": "linux",
             "displayName": "Linux (Stack + RpcEndpoint)",
             "binaryDir": "${sourceDir}/build/linux",
-            "cacheVariables": {"PROFINET_POSIX": "ON"}
+            "cacheVariables": {
+                "PROFINET_POSIX": "ON"
+            },
+            "inherits": "base"
         },
         {
             "name": "portable",
             "displayName": "Portable (codecs + Dispatcher, no OS I/O)",
             "binaryDir": "${sourceDir}/build/portable",
-            "cacheVariables": {"PROFINET_POSIX": "OFF"}
+            "cacheVariables": {
+                "PROFINET_POSIX": "OFF"
+            },
+            "inherits": "base"
         }
     ],
     "buildPresets": [
-        {"name": "linux", "configurePreset": "linux"},
-        {"name": "portable", "configurePreset": "portable"}
+        {
+            "name": "linux",
+            "configurePreset": "linux"
+        },
+        {
+            "name": "portable",
+            "configurePreset": "portable"
+        }
     ],
     "testPresets": [
-        {"name": "linux", "configurePreset": "linux", "output": {"outputOnFailure": true}},
-        {"name": "portable", "configurePreset": "portable", "output": {"outputOnFailure": true}}
+        {
+            "name": "linux",
+            "configurePreset": "linux",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "portable",
+            "configurePreset": "portable",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
     ]
 }
