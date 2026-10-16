@@ -1,4 +1,4 @@
-An EES implementation of profinet
+# An EES implementation of profinet
 
 Linux PROFINET layer-2 library: raw `AF_PACKET` socket, frame parsing
 (Ethernet/802.1Q/FrameID, RT APDU status, DCP header) and FrameID-based hooks.
