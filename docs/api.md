@@ -2,6 +2,7 @@
 
 Namespace: `profinet`. Headers: `#include "profinet/frame.h"` (parsing only)
 or `#include "profinet/stack.h"` (includes `frame.h`).
+`#include "profinet/rpc.h"` (UDP RPC) is separate; it does not need `stack.h`.
 
 ## Types (`frame.h`)
 
@@ -259,3 +260,81 @@ class MyStack : public profinet::Stack
 Runs the matching hooks for one frame. Returns true if the frame is
 PROFINET or matched an EtherType hook. Subclasses can call it to inject
 frames from other sources (pcap replay, simulation).
+
+## RPC (`rpc.h`)
+
+PNIO connection management transport: DCE/RPC connectionless (CL) over
+UDP. Independent of `Stack`; needs no privileges. Multi-byte integers in
+the RPC header and NDR wrapper follow the sender's `drep`; PNIO blocks are
+always big-endian. The library always sends little-endian.
+
+| Constant | Value |
+|---|---|
+| `k_rpc_port` | `34964` (device / server port) |
+| `k_ephemeral_port_first` / `_last` | `49152` / `65535` (client ports) |
+| `rpc_interface::k_device`, `k_controller`, `k_supervisor`, `k_parameter_server` | PNIO interface UUIDs `DEA0000x-6C97-11D1-8271-00A02442DF7D` |
+| `rpc_ptype::k_*` | `k_request` 0, `k_ping` 1, `k_response` 2, `k_fault` 3, `k_working` 4, `k_nocall` 5, `k_reject` 6, `k_ack` 7, `k_fack` 9 |
+| `rpc_flags1::k_*` | `k_last_fragment` 0x02, `k_fragment` 0x04, `k_no_fack` 0x08, `k_maybe` 0x10, `k_idempotent` 0x20, `k_broadcast` 0x40 |
+| `pnio_opnum::k_*` | `k_connect` 0, `k_release` 1, `k_read` 2, `k_write` 3, `k_control` 4, `k_read_implicit` 5 |
+| `pnio_block::k_*` | Common request block types (`k_ar_block_req` 0x0101, `k_iocr_block_req` 0x0102, `k_iod_control_req` 0x0110, ...); OR `k_response_bit` 0x8000 for the response type |
+| `k_pnio_ok` | `PnioStatus{0,0,0,0}` |
+
+### `Uuid`
+`std::array<std::uint8_t, 16>` in canonical (big-endian, as printed) order,
+regardless of the wire byte order.
+
+### `struct RpcHeader`
+Fields of the 80-byte CL header: `ptype`, `flags1`, `flags2`, `object`,
+`interface`, `activity`, `server_boot`, `interface_version`, `sequence`,
+`opnum`, `interface_hint`, `activity_hint`, `fragment_number`. Defaults:
+request, idempotent, version 1, hints `0xFFFF`.
+
+### `struct RpcPacket { RpcHeader header; bool little_endian; Bytes body; }`
+`body` spans the receive buffer (hook lifetime).
+
+### `struct NdrRequest { uint32_t args_maximum; Bytes args; }`
+### `struct NdrResponse { PnioStatus status; uint32_t args_maximum; Bytes args; }`
+NDR wrapper around the PNIO blocks: 20 bytes before `args` (request:
+`ArgsMaximum ArgsLength MaxCount Offset ActualCount`; response: `PNIOStatus` replaces `ArgsMaximum`).
+
+### `struct PnioBlock { uint16_t type; uint8_t version_high, version_low; Bytes content; }`
+`content` starts after `BlockVersionLow`.
+
+### `struct Ipv4Endpoint { std::array<uint8_t,4> ip; uint16_t port = k_rpc_port; }`
+
+### Functions
+| Function | Purpose |
+|---|---|
+| `Uuid make_pnio_object_uuid(instance, device_id, vendor_id)` | `DEA00000-6C97-11D1-8271-IIII-DDDD-VVVV` |
+| `std::optional<RpcPacket> parse_rpc(Bytes datagram)` | `nullopt` if < 80 bytes, not version 4, unknown `drep`, or body overruns |
+| `std::vector<uint8_t> build_rpc(const RpcHeader &, Bytes body)` | Header + body, little-endian |
+| `RpcHeader make_response(const RpcHeader &request)` | Same UUIDs/sequence/opnum; ptype response; flags1 last-fragment \| no-fack |
+| `std::optional<NdrRequest> parse_ndr_request(const RpcPacket &)` | `nullopt` if truncated |
+| `std::optional<NdrResponse> parse_ndr_response(const RpcPacket &)` | `nullopt` if truncated |
+| `build_ndr_request(args_maximum, args)` / `build_ndr_response(status, args_maximum, args)` | Encode wrappers |
+| `std::optional<std::vector<PnioBlock>> parse_blocks(Bytes args)` | `nullopt` if a block overruns |
+| `void append_block(out, type, content, version_high = 1, version_low = 0)` | Append `type \| length \| version \| content` |
+
+## `class RpcEndpoint` (`rpc.h`)
+
+One UDP socket with opnum-based hook dispatch. Not copyable.
+
+### `explicit RpcEndpoint(uint16_t port = k_rpc_port, const std::string &bind_ip = "0.0.0.0")`
+`port = 0` binds the first free port in 49152–65535 (controller side, or a
+device's own requests such as ApplicationReady). Throws `std::system_error`
+on socket/bind failure, `std::invalid_argument` on a malformed `bind_ip`.
+
+### `void on(uint16_t opnum, RpcHook hook)` / `void on_any(RpcHook hook)`
+`RpcHook = std::function<void(const RpcPacket &, const Ipv4Endpoint &from)>`.
+`on` matches any ptype with that opnum (filter `header.ptype` yourself);
+hooks run in registration order. Register before `poll()`/`run()`.
+
+### `int poll(int timeout_ms)` / `void run()` / `void stop()`
+Same contract as `Stack`. Non-RPC datagrams are dropped silently.
+
+### `void send(const Ipv4Endpoint &to, const RpcHeader &header, Bytes body)`
+### `void reply(const RpcPacket &request, const Ipv4Endpoint &to, Bytes body)`
+`reply` = `make_response(request.header)` + this endpoint's `server_boot()`.
+No DCE/RPC fragmentation: large bodies rely on IP fragmentation.
+
+### `uint16_t port() const` / `uint32_t server_boot() const` / `int fd() const`
