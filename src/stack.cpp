@@ -69,6 +69,7 @@ Stack::Stack(const std::string &interface_name)
             fail("bind");
         }
         join_multicast(k_multicast_dcp);
+        join_multicast(k_multicast_lldp);
     }
     catch (...)
     {
@@ -119,15 +120,33 @@ void Stack::on_any(Hook hook)
     on(0x0000, 0xFFFF, std::move(hook));
 }
 
-void Stack::dispatch(const FrameView &frame) const
+void Stack::on_ethertype(const std::uint16_t ethertype, Hook hook)
 {
-    for (const Entry &e : hooks_)
+    ethertype_hooks_.emplace_back(ethertype, std::move(hook));
+}
+
+bool Stack::dispatch(const FrameView &frame) const
+{
+    bool matched = frame.ethertype == k_ethertype;
+    if (matched)
     {
-        if (frame.frame_id >= e.first && frame.frame_id <= e.last)
+        for (const Entry &e : hooks_)
         {
-            e.hook(frame);
+            if (frame.frame_id >= e.first && frame.frame_id <= e.last)
+            {
+                e.hook(frame);
+            }
         }
     }
+    for (const auto &[type, hook] : ethertype_hooks_)
+    {
+        if (type == frame.ethertype)
+        {
+            hook(frame);
+            matched = true;
+        }
+    }
+    return matched;
 }
 
 int Stack::poll(const int timeout_ms)
@@ -176,10 +195,15 @@ int Stack::poll(const int timeout_ms)
             continue;
         }
 
-        auto frame = parse(Bytes(buf, static_cast<std::size_t>(n)));
+        const Bytes bytes(buf, static_cast<std::size_t>(n));
+        auto frame = parse(bytes);
         if (!frame)
         {
-            continue;
+            frame = parse_ethernet(bytes);
+            if (!frame || frame->ethertype == k_ethertype)
+            {
+                continue; // runt or truncated PROFINET frame
+            }
         }
         for (cmsghdr *c = CMSG_FIRSTHDR(&msg); c; c = CMSG_NXTHDR(&msg, c))
         {
@@ -196,8 +220,7 @@ int Stack::poll(const int timeout_ms)
                     static_cast<std::uint16_t>(aux.tp_vlan_tci & 0x0FFF)};
             }
         }
-        dispatch(*frame);
-        ++handled;
+        handled += dispatch(*frame);
     }
     return handled;
 }

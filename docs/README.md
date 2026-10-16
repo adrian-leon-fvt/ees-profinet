@@ -19,6 +19,8 @@ application also gets helpers to build and send frames.
 | Included | Not included (build on top with hooks) |
 |---|---|
 | Raw `AF_PACKET` socket bound to one interface | Connection management (CM / DCE-RPC over UDP 34964) |
+| DCP + LLDP multicast group membership | MRP, SNMP |
+| LLDP parse/build, hooks for any EtherType | Periodic LLDP transmission (call `build_lldp` from a timer) |
 | Ethernet + 802.1Q VLAN + FrameID parsing | Alarm protocol (acknowledgement, sequence numbers) |
 | Cyclic RT APDU status trailer parsing | IO device / controller state machines |
 | DCP PDU header parsing | DCP block (option/suboption) parsing |

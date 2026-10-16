@@ -76,11 +76,29 @@ Constants are in `profinet::frame_id`.
 | `0xFEFE` | DCP Identify request (multicast `01:0E:CF:00:00:00`) | `is_dcp` |
 | `0xFEFF` | DCP Identify response | `is_dcp` |
 
+## Other EtherTypes (LLDP, MRP, ...)
+
+`on_ethertype(type, hook)` receives frames of any EtherType. For those,
+`FrameView::payload` starts right after the EtherType and `frame_id` is 0.
+`profinet/lldp.h` decodes and builds LLDP (`0x88CC`), which PROFINET devices
+must send for topology detection:
+
+```
+ dst=01:80:C2:00:00:0E │ src │ 0x88CC │ TLV │ TLV │ ... │ End(0,0)
+ TLV = type(7 bit) | length(9 bit) | value(length)
+ mandatory: Chassis ID(1), Port ID(2), TTL(3); PROFINET uses subtype 7
+ (locally assigned): chassis = NameOfStation, port = "port-001"
+```
+
+The library does not send LLDP periodically by itself; call
+`send_raw(build_lldp(...))` from a timer (every 5 s is typical, TTL 20 s).
+
 ## Multicast
 
 Network cards drop multicast frames for groups nobody has joined. `Stack`
-joins `01:0E:CF:00:00:00` (DCP Identify / Hello) when it is constructed, so a
-device sees Identify-All requests from engineering tools. Join other groups
+joins `01:0E:CF:00:00:00` (DCP Identify / Hello) and `01:80:C2:00:00:0E`
+(LLDP) when it is constructed, so a device sees Identify-All requests from
+engineering tools and neighbours' LLDP frames. Join other groups
 (e.g. multicast cyclic data) with `join_multicast()`. To receive *all*
 multicast while debugging: `sudo ip link set <if> allmulticast on`.
 
@@ -93,12 +111,15 @@ multicast while debugging: `sudo ip link set <if> allmulticast on`.
 2. Reads **every** pending frame without blocking.
 3. For each frame:
    - drops frames this host sent (`PACKET_OUTGOING`);
-   - drops non-PROFINET frames (`parse()` returns `nullopt`);
+   - parses PROFINET frames with `parse()`, everything else with
+     `parse_ethernet()`; drops runts and truncated PROFINET frames;
    - fills in `FrameView::vlan` from the kernel if the NIC stripped the VLAN
      tag (hardware VLAN offload);
-   - calls **every** hook whose `[first, last]` range contains the FrameID,
-     in registration order.
-4. Returns how many PROFINET frames were dispatched.
+   - PROFINET: calls **every** `on()` hook whose `[first, last]` range
+     contains the FrameID, in registration order;
+   - then calls every `on_ethertype()` hook registered for the frame's
+     EtherType, in registration order.
+4. Returns how many frames were PROFINET or matched an EtherType hook.
 
 `Stack::run()` calls `poll(100)` in a loop until `stop()`.
 

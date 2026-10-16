@@ -15,6 +15,7 @@ namespace pn = profinet;
 - [Discover devices (DCP Identify-All)](#discover-devices-dcp-identify-all)
 - [Integrate with your own epoll loop](#integrate-with-your-own-epoll-loop)
 - [Hand frames to a worker thread](#hand-frames-to-a-worker-thread)
+- [Send and receive LLDP](#send-and-receive-lldp)
 - [VLAN tagging](#vlan-tagging)
 - [Several interfaces](#several-interfaces)
 - [Decode frames without a socket](#decode-frames-without-a-socket)
@@ -292,6 +293,43 @@ struct FrameQueue
 ```
 
 With hardware VLAN offload, `raw` has no tag; copy `f.vlan` too if you need it.
+
+## Send and receive LLDP
+
+PROFINET devices announce themselves on every port with LLDP: chassis ID =
+NameOfStation, port ID = `port-NNN`, plus PROFINET org-specific TLVs.
+
+```cpp
+#include <chrono>
+#include <map>
+#include <thread>
+
+void lldp_neighbours(pn::Stack &stack, std::map<std::string, std::string> &neighbours)
+{
+    stack.on_ethertype(pn::k_ethertype_lldp, [&](const pn::FrameView &f) {
+        const auto l = pn::parse_lldp(f);
+        if (l)
+        {
+            neighbours[l->chassis_id] = l->port_id; // strings are owned copies
+        }
+    });
+}
+
+void lldp_announce(pn::Stack &stack, const std::string &name_of_station)
+{
+    std::vector<std::uint8_t> extra;
+    // PROFINET chassis MAC TLV (OUI 00:0E:CF, subtype 5)
+    pn::append_lldp_org_tlv(extra, pn::k_oui_profinet, 5, stack.mac());
+    const auto frame = pn::build_lldp(stack.mac(), name_of_station, "port-001", 20, extra);
+    for (;;)
+    {
+        stack.send_raw(frame); // send() is thread-safe; run this in its own thread
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+    }
+}
+```
+
+Other EtherTypes work the same way with `on_ethertype(0x88E3, ...)` (MRP) etc.
 
 ## VLAN tagging
 

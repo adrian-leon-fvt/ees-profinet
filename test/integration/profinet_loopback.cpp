@@ -46,6 +46,11 @@ int main(const int argc, char **argv)
 
         int rt_ok = 0;
         int dcp_ok = 0;
+        int lldp_ok = 0;
+        rx.on_ethertype(profinet::k_ethertype_lldp, [&](const auto &f) {
+            const auto l = profinet::parse_lldp(f);
+            lldp_ok += l && l->chassis_id == "loopback-tx" && l->port_id == "port-001";
+        });
         rx.on(
             profinet::frame_id::k_rt_class1_first,
             profinet::frame_id::k_rt_class1_last,
@@ -69,20 +74,23 @@ int main(const int argc, char **argv)
 
         tx.send(rx.mac(), 0xC001, rt);
         tx.send(multicast, profinet::frame_id::k_dcp_identify_req, dcp);
+        tx.send_raw(profinet::build_lldp(tx.mac(), "loopback-tx", "port-001"));
 
         // ponytail: fixed 10 x 100 ms window; raise if testing over slow links.
-        for (int i = 0; i < 10 && (rt_ok == 0 || dcp_ok == 0); ++i)
+        for (int i = 0; i < 10 && (rt_ok == 0 || dcp_ok == 0 || lldp_ok == 0); ++i)
         {
             rx.poll(100);
         }
 
-        const bool mcast_ok = in_dev_mcast(argv[2], "010ecf000000");
+        const bool mcast_ok = in_dev_mcast(argv[2], "010ecf000000") &&
+                              in_dev_mcast(argv[2], "0180c200000e");
 
-        std::printf("RT  : %s\nDCP : %s\nMCAST: %s\n",
+        std::printf("RT  : %s\nDCP : %s\nLLDP: %s\nMCAST: %s\n",
                     rt_ok ? "PASS" : "FAIL",
                     dcp_ok ? "PASS" : "FAIL",
+                    lldp_ok ? "PASS" : "FAIL",
                     mcast_ok ? "PASS" : "FAIL");
-        return rt_ok && dcp_ok && mcast_ok ? 0 : 1;
+        return rt_ok && dcp_ok && lldp_ok && mcast_ok ? 0 : 1;
     }
     catch (const std::exception &e)
     {

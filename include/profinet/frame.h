@@ -68,7 +68,7 @@ struct DcpHeader
 };
 
 /**
- * @brief Parsed, non-owning view of one PROFINET frame.
+ * @brief Parsed, non-owning view of one Ethernet frame.
  * @note Spans point into the receive buffer; valid only inside the hook.
  */
 struct FrameView
@@ -76,8 +76,9 @@ struct FrameView
     Mac dst{};
     Mac src{};
     std::optional<Vlan> vlan;
-    std::uint16_t frame_id = 0;
-    Bytes payload; ///< Bytes after FrameID (incl. any trailer/padding).
+    std::uint16_t ethertype = 0;
+    std::uint16_t frame_id = 0; ///< PROFINET only; 0 for other EtherTypes.
+    Bytes payload; ///< After FrameID (PROFINET) or after EtherType (others).
     Bytes raw;     ///< Whole Ethernet frame.
 };
 
@@ -88,7 +89,14 @@ bool is_cyclic(std::uint16_t id);
 bool is_dcp(std::uint16_t id);
 
 /**
- * @brief Parse an Ethernet frame.
+ * @brief Parse an Ethernet header of any EtherType.
+ * @param raw Frame bytes starting at destination MAC, without FCS.
+ * @return View with payload = bytes after EtherType, or nullopt if too short.
+ */
+std::optional<FrameView> parse_ethernet(Bytes raw);
+
+/**
+ * @brief Parse a PROFINET frame.
  * @param raw Frame bytes starting at destination MAC, without FCS.
  * @return View, or nullopt if not a PROFINET frame / too short.
  */
@@ -104,7 +112,18 @@ Bytes cyclic_data(const FrameView &frame);
 std::optional<DcpHeader> parse_dcp(const FrameView &frame);
 
 /**
- * @brief Build an Ethernet frame, padded to the 60-byte minimum.
+ * @brief Build an Ethernet frame of any EtherType, padded to 60 bytes.
+ * @param payload Bytes placed after the EtherType.
+ */
+std::vector<std::uint8_t> build_ethernet(
+    const Mac &dst,
+    const Mac &src,
+    std::uint16_t ethertype,
+    Bytes payload,
+    const std::optional<Vlan> &vlan = std::nullopt);
+
+/**
+ * @brief Build a PROFINET frame, padded to the 60-byte minimum.
  * @param payload Bytes placed after FrameID.
  */
 std::vector<std::uint8_t> build(

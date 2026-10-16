@@ -35,9 +35,9 @@ bool is_dcp(const std::uint16_t id)
     return id >= frame_id::k_dcp_hello && id <= frame_id::k_dcp_identify_rsp;
 }
 
-std::optional<FrameView> parse(const Bytes raw)
+std::optional<FrameView> parse_ethernet(const Bytes raw)
 {
-    if (raw.size() < 16)
+    if (raw.size() < 14)
     {
         return std::nullopt;
     }
@@ -49,17 +49,29 @@ std::optional<FrameView> parse(const Bytes raw)
     std::size_t off = 12;
     if (be16(&raw[off]) == k_ethertype_vlan)
     {
+        if (raw.size() < 18)
+        {
+            return std::nullopt;
+        }
         const std::uint16_t tci = be16(&raw[off + 2]);
         f.vlan = Vlan{static_cast<std::uint8_t>(tci >> 13),
                       static_cast<std::uint16_t>(tci & 0x0FFF)};
         off += 4;
     }
-    if (raw.size() < off + 4 || be16(&raw[off]) != k_ethertype)
+    f.ethertype = be16(&raw[off]);
+    f.payload = raw.subspan(off + 2);
+    return f;
+}
+
+std::optional<FrameView> parse(const Bytes raw)
+{
+    auto f = parse_ethernet(raw);
+    if (!f || f->ethertype != k_ethertype || f->payload.size() < 2)
     {
         return std::nullopt;
     }
-    f.frame_id = be16(&raw[off + 2]);
-    f.payload = raw.subspan(off + 4);
+    f->frame_id = be16(f->payload.data());
+    f->payload = f->payload.subspan(2);
     return f;
 }
 
@@ -96,10 +108,10 @@ std::optional<DcpHeader> parse_dcp(const FrameView &frame)
         be16(&p[8])};
 }
 
-std::vector<std::uint8_t> build(
+std::vector<std::uint8_t> build_ethernet(
     const Mac &dst,
     const Mac &src,
-    const std::uint16_t id,
+    const std::uint16_t ethertype,
     const Bytes payload,
     const std::optional<Vlan> &vlan)
 {
@@ -112,14 +124,27 @@ std::vector<std::uint8_t> build(
             out,
             static_cast<std::uint16_t>((vlan->pcp << 13) | (vlan->vid & 0x0FFF)));
     }
-    put16(out, k_ethertype);
-    put16(out, id);
+    put16(out, ethertype);
     out.insert(out.end(), payload.begin(), payload.end());
     if (out.size() < k_min_frame)
     {
         out.resize(k_min_frame, 0);
     }
     return out;
+}
+
+std::vector<std::uint8_t> build(
+    const Mac &dst,
+    const Mac &src,
+    const std::uint16_t id,
+    const Bytes payload,
+    const std::optional<Vlan> &vlan)
+{
+    std::vector<std::uint8_t> pdu;
+    pdu.reserve(2 + payload.size());
+    put16(pdu, id);
+    pdu.insert(pdu.end(), payload.begin(), payload.end());
+    return build_ethernet(dst, src, k_ethertype, pdu, vlan);
 }
 
 } // namespace profinet

@@ -6,6 +6,7 @@
 test/
 ├── unit/                     GoogleTest, no privileges, no network
 │   ├── test_frame.cpp        parse/build/APDU/DCP
+│   ├── test_lldp.cpp         LLDP TLV parse/build
 │   └── test_stack.cpp        hook dispatch, poll/run/stop (socketpair)
 └── integration/
     ├── profinet_loopback.cpp manual test app: TX on one interface, RX on another
@@ -36,15 +37,16 @@ sudo build/profinet_loopback <tx_if> <rx_if>
 ```
 
 Sends a class-1 RT frame (unicast to `rx_if`'s MAC) and a DCP Identify
-(multicast) out of `tx_if`, and checks that hooks on `rx_if` receive both
+(multicast) and an LLDP frame out of `tx_if`, and checks that hooks on `rx_if` receive all three
 with intact headers, APDU status and payload length. It also checks
-`/proc/net/dev_mcast` to confirm `rx_if` joined the DCP multicast group
+`/proc/net/dev_mcast` to confirm `rx_if` joined the DCP and LLDP multicast groups
 (a veth pair delivers multicast even without joining, so receipt alone
 doesn't prove it).
 
 ```
 RT  : PASS
 DCP : PASS
+LLDP: PASS
 MCAST: PASS
 ```
 

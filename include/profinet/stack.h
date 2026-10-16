@@ -6,10 +6,12 @@
 #define PROFINET_STACK_H
 
 #include "profinet/frame.h"
+#include "profinet/lldp.h"
 
 #include <atomic>
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace profinet
@@ -46,8 +48,17 @@ class Stack
     void on_any(Hook hook);
 
     /**
+     * @brief Call @p hook for every frame with EtherType @p ethertype
+     *        (e.g. k_ethertype_lldp). FrameView::payload starts after the
+     *        EtherType and frame_id is 0. For 0x8892 the view is the
+     *        PROFINET one (payload after FrameID).
+     */
+    void on_ethertype(std::uint16_t ethertype, Hook hook);
+
+    /**
      * @brief Ask the NIC to deliver frames sent to multicast MAC @p group.
-     * @note The constructor already joins k_multicast_dcp. Membership lasts
+     * @note The constructor already joins k_multicast_dcp and
+     *       k_multicast_lldp. Membership lasts
      *       until the Stack is destroyed.
      * @throws std::system_error on failure.
      */
@@ -55,7 +66,8 @@ class Stack
 
     /**
      * @brief Wait up to @p timeout_ms for frames and dispatch them.
-     * @return Number of PROFINET frames dispatched.
+     * @return Number of frames that reached at least one hook's filter
+     *         (every PROFINET frame, plus frames of a hooked EtherType).
      */
     int poll(int timeout_ms);
 
@@ -96,8 +108,11 @@ class Stack
      */
     Stack(int fd, const Mac &mac, int ifindex);
 
-    /** @brief Run matching hooks for one received frame. */
-    void dispatch(const FrameView &frame) const;
+    /**
+     * @brief Run matching hooks for one received frame.
+     * @return true if the frame is PROFINET or matched an EtherType hook.
+     */
+    bool dispatch(const FrameView &frame) const;
 
   private:
     struct Entry
@@ -112,6 +127,7 @@ class Stack
     bool connected_ = false; ///< Adopted non-AF_PACKET socket: plain send().
     Mac mac_{};
     std::vector<Entry> hooks_;
+    std::vector<std::pair<std::uint16_t, Hook>> ethertype_hooks_;
     std::atomic<bool> running_{false};
 };
 

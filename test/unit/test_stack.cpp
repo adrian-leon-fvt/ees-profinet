@@ -143,6 +143,47 @@ TEST_F(StackTest, SendOnAdoptedSocketReachesPeerWithOwnMacAsSource)
     EXPECT_EQ(f->payload[2], 3);
 }
 
+TEST_F(StackTest, EthertypeHookGetsLldpAndFrameIdHooksDoNot)
+{
+    std::optional<Lldp> lldp;
+    int pn_calls = 0;
+    stack_->on_any([&](const FrameView &) { ++pn_calls; });
+    stack_->on_ethertype(k_ethertype_lldp, [&](const FrameView &f) {
+        lldp = parse_lldp(f);
+    });
+    inject_raw(build_lldp(k_dst, "dev-7", "port-002"));
+
+    EXPECT_EQ(stack_->poll(100), 1);
+
+    EXPECT_EQ(pn_calls, 0);
+    ASSERT_TRUE(lldp);
+    EXPECT_EQ(lldp->chassis_id, "dev-7");
+}
+
+TEST_F(StackTest, EthertypeHookOnProfinetSeesProfinetView)
+{
+    std::uint16_t id = 0;
+    stack_->on_ethertype(k_ethertype, [&](const FrameView &f) { id = f.frame_id; });
+    inject(0xC001);
+
+    stack_->poll(100);
+
+    EXPECT_EQ(id, 0xC001);
+}
+
+TEST_F(StackTest, TruncatedProfinetFrameIsDropped)
+{
+    int calls = 0;
+    stack_->on_any([&](const FrameView &) { ++calls; });
+    stack_->on_ethertype(k_ethertype, [&](const FrameView &) { ++calls; });
+    const std::vector<std::uint8_t> runt{
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0x88, 0x92, 0xC0};
+    inject_raw(runt);
+
+    EXPECT_EQ(stack_->poll(100), 0);
+    EXPECT_EQ(calls, 0);
+}
+
 TEST_F(StackTest, StopFromHookEndsRun)
 {
     int calls = 0;
