@@ -80,6 +80,13 @@ class Stack
     }
 
   protected:
+    /**
+     * @brief Adopt an already-open socket (testing / privilege separation).
+     * @param fd Datagram socket delivering whole Ethernet frames; closed on
+     *           destruction.
+     */
+    Stack(int fd, const Mac &mac, int ifindex);
+
     /** @brief Run matching hooks for one received frame. */
     void dispatch(const FrameView &frame) const;
 

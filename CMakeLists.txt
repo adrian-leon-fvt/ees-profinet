@@ -18,15 +18,28 @@ install(EXPORT profinetTargets NAMESPACE profinet::
     FILE profinetConfig.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/profinet)
 
-if(PROJECT_IS_TOP_LEVEL)
+option(PROFINET_BUILD_EXAMPLES "Build example programs" ${PROJECT_IS_TOP_LEVEL})
+option(PROFINET_BUILD_TESTS "Build unit tests and loopback test app" ${PROJECT_IS_TOP_LEVEL})
+
+if(PROFINET_BUILD_EXAMPLES)
     add_executable(pn_sniff examples/pn_sniff.cpp)
     target_link_libraries(pn_sniff PRIVATE profinet)
+endif()
 
-    find_package(GTest)
-    if(GTest_FOUND)
-        enable_testing()
-        add_executable(profinet_test test/test_frame.cpp)
-        target_link_libraries(profinet_test PRIVATE profinet GTest::gtest_main)
-        add_test(NAME profinet_test COMMAND profinet_test)
-    endif()
+if(PROFINET_BUILD_TESTS)
+    enable_testing()
+
+    add_executable(profinet_loopback test/integration/profinet_loopback.cpp)
+    target_link_libraries(profinet_loopback PRIVATE profinet)
+    add_test(NAME profinet_loopback
+        COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/test/integration/loopback_netns.sh
+                $<TARGET_FILE:profinet_loopback>)
+    set_tests_properties(profinet_loopback PROPERTIES
+        LABELS integration SKIP_RETURN_CODE 77 TIMEOUT 10)
+
+    find_package(GTest REQUIRED)
+    add_executable(profinet_test test/unit/test_frame.cpp test/unit/test_stack.cpp)
+    target_link_libraries(profinet_test PRIVATE profinet GTest::gtest_main)
+    include(GoogleTest)
+    gtest_discover_tests(profinet_test PROPERTIES LABELS unit TIMEOUT 5)
 endif()

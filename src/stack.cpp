@@ -76,6 +76,11 @@ Stack::Stack(const std::string &interface_name)
     }
 }
 
+Stack::Stack(const int fd, const Mac &mac, const int ifindex)
+    : fd_(fd), ifindex_(ifindex), mac_(mac)
+{
+}
+
 Stack::~Stack()
 {
     ::close(fd_);

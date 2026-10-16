@@ -11,6 +11,17 @@ cmake -S . -B build && cmake --build build && ctest --test-dir build
 sudo cmake --install build   # optional
 ```
 
+Options (default ON when top-level, OFF when added via `add_subdirectory`):
+`PROFINET_BUILD_TESTS`, `PROFINET_BUILD_EXAMPLES`.
+
+## Test
+
+- `ctest --test-dir build -L unit` — GoogleTest, no privileges needed.
+- `ctest --test-dir build -L integration` — runs `profinet_loopback` over a
+  veth pair in an unprivileged netns; skipped if user namespaces are off.
+- Manual, on real hardware: `sudo build/profinet_loopback <tx_if> <rx_if>`
+  with the two interfaces linked. Exit 0 = pass.
+
 ## Use
 
 ```cmake
