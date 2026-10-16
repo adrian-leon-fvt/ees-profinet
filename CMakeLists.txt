@@ -4,7 +4,7 @@ project(profinet VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(profinet src/frame.cpp src/lldp.cpp src/stack.cpp)
+add_library(profinet src/frame.cpp src/lldp.cpp src/rpc.cpp src/stack.cpp)
 add_library(profinet::profinet ALIAS profinet)
 target_include_directories(profinet PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -39,7 +39,7 @@ if(PROFINET_BUILD_TESTS)
         LABELS integration SKIP_RETURN_CODE 77 TIMEOUT 10)
 
     find_package(GTest REQUIRED)
-    add_executable(profinet_test test/unit/test_frame.cpp test/unit/test_lldp.cpp test/unit/test_stack.cpp)
+    add_executable(profinet_test test/unit/test_frame.cpp test/unit/test_lldp.cpp test/unit/test_rpc.cpp test/unit/test_stack.cpp)
     target_link_libraries(profinet_test PRIVATE profinet GTest::gtest_main)
     include(GoogleTest)
     gtest_discover_tests(profinet_test PROPERTIES LABELS unit TIMEOUT 5)
