@@ -8,6 +8,7 @@
 #include "profinet/stack.h"
 
 #include <gtest/gtest.h>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -18,15 +19,6 @@ namespace
 const Mac k_dst{0x01, 0x0E, 0xCF, 0x00, 0x00, 0x00};
 const Mac k_src{0x02, 0x00, 0x00, 0x00, 0x00, 0x01};
 
-/** @brief Stack bound to one end of a socketpair; tests write the other. */
-class TestStack : public Stack
-{
-  public:
-    explicit TestStack(const int fd) : Stack(fd, k_src, 1)
-    {
-    }
-};
-
 class StackTest : public ::testing::Test
 {
   protected:
@@ -34,7 +26,7 @@ class StackTest : public ::testing::Test
     {
         int fds[2];
         ASSERT_EQ(::socketpair(AF_UNIX, SOCK_DGRAM, 0, fds), 0);
-        stack_ = std::make_unique<TestStack>(fds[0]);
+        stack_ = std::make_unique<Stack>(fds[0], k_src, 1);
         peer_ = fds[1];
     }
 
@@ -56,7 +48,7 @@ class StackTest : public ::testing::Test
             static_cast<ssize_t>(frame.size()));
     }
 
-    std::unique_ptr<TestStack> stack_;
+    std::unique_ptr<Stack> stack_;
     int peer_ = -1;
 };
 } // namespace
@@ -197,4 +189,21 @@ TEST_F(StackTest, StopFromHookEndsRun)
 
     EXPECT_EQ(calls, 1);
     EXPECT_EQ(stack_->mac(), k_src);
+}
+
+TEST(StackOwnership, BorrowedFdStaysOpenOwnedFdIsClosed)
+{
+    int fds[2];
+    ASSERT_EQ(::socketpair(AF_UNIX, SOCK_DGRAM, 0, fds), 0);
+
+    {
+        Stack borrowed(fds[0], k_src, 1, fd_ownership_t::BORROW);
+    }
+    EXPECT_NE(::fcntl(fds[0], F_GETFD), -1);
+
+    {
+        Stack owned(fds[0], k_src, 1);
+    }
+    EXPECT_EQ(::fcntl(fds[0], F_GETFD), -1);
+    ::close(fds[1]);
 }

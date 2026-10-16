@@ -78,8 +78,15 @@ Stack::Stack(const std::string &interface_name)
     }
 }
 
-Stack::Stack(const int fd, const Mac &mac, const int ifindex)
-    : fd_(fd), ifindex_(ifindex), mac_(mac)
+Stack::Stack(
+    const int fd,
+    const Mac &mac,
+    const int ifindex,
+    const fd_ownership_t ownership)
+    : fd_(fd),
+      ifindex_(ifindex),
+      owns_fd_(ownership == fd_ownership_t::OWN),
+      mac_(mac)
 {
     sockaddr_storage addr{};
     socklen_t len = sizeof(addr);
@@ -89,7 +96,10 @@ Stack::Stack(const int fd, const Mac &mac, const int ifindex)
 
 Stack::~Stack()
 {
-    ::close(fd_);
+    if (owns_fd_)
+    {
+        ::close(fd_);
+    }
 }
 
 void Stack::join_multicast(const Mac &group)

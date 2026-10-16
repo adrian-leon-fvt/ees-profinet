@@ -15,10 +15,18 @@
 namespace profinet
 {
 
+/** @brief Who closes the fd passed to Stack(int, const Mac &, int, ...). */
+enum class fd_ownership_t
+{
+    OWN,   ///< Stack closes the fd on destruction.
+    BORROW ///< Caller keeps the fd and closes it after the Stack is gone.
+};
+
 /**
  * @brief Binds an AF_PACKET socket to one interface, receives frames and
  *        feeds them to the inherited Dispatcher hooks.
- * @note Needs CAP_NET_RAW. Register hooks before calling poll()/run();
+ * @note Stack(interface_name) needs CAP_NET_RAW; an adopted fd needs no
+ *       privileges here. Register hooks before calling poll()/run();
  *       hook registration is not thread-safe.
  */
 class Stack : public Dispatcher
@@ -33,7 +41,28 @@ class Stack : public Dispatcher
      *         PACKET_ADD_MEMBERSHIP.
      */
     explicit Stack(const std::string &interface_name);
-    /** @brief Close the socket (drops multicast memberships). */
+
+    /**
+     * @brief Use a socket the application opened.
+     *
+     * Uses: privilege separation (privileged helper opens the raw socket),
+     * a socket shared with other code, or unit tests over a socketpair.
+     * Nothing is configured on @p fd: enable PACKET_AUXDATA and join
+     * multicast groups (join_multicast()) yourself if needed.
+     * @param fd AF_PACKET socket, or a connected datagram socket (e.g.
+     *           socketpair) delivering whole Ethernet frames. Non-AF_PACKET
+     *           sockets transmit with send().
+     * @param mac Source MAC reported by mac() and used by send().
+     * @param ifindex Interface index for sendto() on AF_PACKET sockets.
+     * @param ownership OWN: closed by ~Stack(). BORROW: left open.
+     */
+    Stack(
+        int fd,
+        const Mac &mac,
+        int ifindex,
+        fd_ownership_t ownership = fd_ownership_t::OWN);
+
+    /** @brief Close the socket if owned (drops multicast memberships). */
     virtual ~Stack();
     Stack(const Stack &) = delete;
     Stack &operator=(const Stack &) = delete;
@@ -104,25 +133,11 @@ class Stack : public Dispatcher
         return fd_;
     }
 
-  protected:
-    /**
-     * @brief Adopt an already-open socket (testing / privilege separation).
-     *
-     * Reach it through a subclass. Uses: unit-test hooks over a socketpair
-     * (docs/testing.md), or open the raw socket in a privileged helper and
-     * pass the fd to an unprivileged process.
-     * @param fd AF_PACKET socket, or a connected datagram socket (e.g.
-     *           socketpair) delivering whole Ethernet frames; closed on
-     *           destruction. Non-AF_PACKET sockets transmit with send().
-     * @param mac Source MAC reported by mac() and used by send().
-     * @param ifindex Interface index for sendto() on AF_PACKET sockets.
-     */
-    Stack(int fd, const Mac &mac, int ifindex);
-
   private:
     int fd_ = -1;
     int ifindex_ = 0;
     bool connected_ = false; ///< Adopted non-AF_PACKET socket: plain send().
+    bool owns_fd_ = true;
     Mac mac_{};
     std::atomic<bool> running_{false};
 };
