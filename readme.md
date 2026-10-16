@@ -24,6 +24,9 @@ Presets: `cmake --preset linux` (full) or `cmake --preset portable`
 - `ctest --test-dir build -L unit` — GoogleTest, no privileges needed.
 - `ctest --test-dir build -L integration` — runs `profinet_loopback` over a
   veth pair in an unprivileged netns; skipped if user namespaces are off.
+- `ctest --test-dir build -L e2e` — profinet-py (independent Python
+  controller) drives a test device built on the lib; set
+  `PROFINET_E2E_PYTHON` to a venv with `test/e2e/requirements.txt`.
 - `cmake --build build --target docs` — Doxygen HTML; fails on undocumented public API (also run in CI).
 - Manual, on real hardware: `sudo build/profinet_loopback <tx_if> <rx_if>`
   with the two interfaces linked. Exit 0 = pass.

@@ -42,6 +42,7 @@ so also pass `-DPROFINET_BUILD_TESTS=OFF` there).
 |---|---|---|---|
 | `PROFINET_POSIX` | `ON` | `ON` | `OFF` drops `stack.cpp`, `rpc_endpoint.cpp`, POSIX tests and examples, and doesn't install `stack.h`. Library then has no OS dependency. |
 | `PROFINET_BUILD_TESTS` | `ON` | `OFF` | GoogleTest unit tests, `profinet_loopback`, ctest entries |
+| `PROFINET_E2E_PYTHON` | `python3` | `python3` | Interpreter with profinet-py + pytest for the `e2e` ctest ([testing.md](testing.md)) |
 | `PROFINET_BUILD_EXAMPLES` | `ON` | `OFF` | `pn_sniff` example |
 | `PROFINET_BUILD_DOCS` | `ON` | `OFF` | `docs` target (Doxygen HTML in `build/html/`; needs Doxygen, skipped if missing). Undocumented public API fails it. |
 | `BUILD_SHARED_LIBS` | `OFF` | inherited | Build `libprofinet.so` instead of `.a` |

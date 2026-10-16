@@ -1,0 +1,2 @@
+profinet-py==0.6.6
+pytest>=8

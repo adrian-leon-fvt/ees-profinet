@@ -55,6 +55,15 @@ if(PROFINET_BUILD_TESTS)
                     $<TARGET_FILE:profinet_loopback>)
         set_tests_properties(profinet_loopback PROPERTIES
             LABELS integration SKIP_RETURN_CODE 77 TIMEOUT 10)
+
+        set(PROFINET_E2E_PYTHON python3 CACHE STRING "Python with profinet-py + pytest (test/e2e/requirements.txt)")
+        add_executable(profinet_e2e_device test/e2e/e2e_device.cpp)
+        target_link_libraries(profinet_e2e_device PRIVATE profinet)
+        add_test(NAME profinet_e2e
+            COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/test/e2e/run_e2e.sh
+                    $<TARGET_FILE:profinet_e2e_device> ${PROFINET_E2E_PYTHON} -q)
+        set_tests_properties(profinet_e2e PROPERTIES
+            LABELS e2e SKIP_RETURN_CODE 77 TIMEOUT 120)
     endif()
 
     include(GoogleTest)

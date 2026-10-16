@@ -11,9 +11,14 @@ test/
 │   ├── test_rpc.cpp          DCE/RPC header (LE + hand-encoded BE), NDR, blocks
 │   ├── test_rpc_endpoint.cpp UDP request/reply on 127.0.0.1 (POSIX only)
 │   └── test_stack.cpp        receive loop, poll/run/stop, fd ownership (socketpair; POSIX only)
-└── integration/
-    ├── profinet_loopback.cpp manual test app: TX on one interface, RX on another
-    └── loopback_netns.sh     runs it over a veth pair in a user netns (ctest)
+├── integration/
+│   ├── profinet_loopback.cpp manual test app: TX on one interface, RX on another
+│   └── loopback_netns.sh     runs it over a veth pair in a user netns (ctest)
+└── e2e/                      end-to-end against an independent controller (profinet-py)
+    ├── e2e_device.cpp        minimal IO-Device on Stack + RpcEndpoint
+    ├── test_e2e.py           pytest: profinet-py drives the device
+    ├── run_e2e.sh            veth pair + user netns, then pytest (ctest)
+    └── requirements.txt      profinet-py, pytest
 ```
 
 All of it is built only when `PROFINET_BUILD_TESTS=ON` (default when this
@@ -33,6 +38,44 @@ build/profinet_test --gtest_filter='StackTest.*'   # run gtest directly
 The integration test needs unprivileged user namespaces
 (`unshare -rn`). Where they are disabled (some containers, hardened
 kernels), ctest reports it as **skipped**, not failed.
+
+## End-to-end: profinet-py
+
+[profinet-py](https://pypi.org/project/profinet-py/) is an independent
+IO-Controller written in Python. `test/e2e/` runs it against
+`profinet_e2e_device`, a minimal IO-Device built on this library. The two
+sides share no code, so encoding mistakes mirrored in both our encoder and
+our unit tests show up here.
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install -r test/e2e/requirements.txt
+cmake --preset linux -DPROFINET_E2E_PYTHON=$PWD/.venv/bin/python
+cmake --build --preset linux
+ctest --preset linux -L e2e
+# or directly, with pytest args:
+test/e2e/run_e2e.sh build/linux/profinet_e2e_device .venv/bin/python -v -k read
+```
+
+| Test | profinet-py call | Library code exercised |
+|---|---|---|
+| Identify all / by name | `send_discover`, `send_request` | `Stack`, `parse_dcp`, DCP multicast join, `build` |
+| Get name / IP | `get_param` | DCP Get (unicast 0xFEFD) |
+| Set name / IP, Signal | `set_param`, `set_ip`, `signal_device` | DCP Set + Control/Response |
+| Read implicit, unknown index, Write | `RPCCon.read_implicit`, `write` | `RpcEndpoint`, RPC header, NDR, blocks, PNIO status |
+
+Each test starts a fresh device process, so Set/Write never leak between
+tests. Skipped (exit 77) if `PROFINET_E2E_PYTHON` can't import
+`profinet` and `pytest`, or user namespaces are off. Takes ~8 s.
+
+Limits:
+
+- No AR (Connect), cyclic IO or alarms: the test device doesn't implement
+  the CM state machine, so these can't be driven yet.
+- profinet-py is lenient: it ignores response UUIDs and NDR ArgsLength, so
+  those are covered only by unit tests. DCP XIDs are checked
+  (`strict_xid=True`).
+- profinet-py is GPL-3.0. It is only installed and run as an external test
+  tool; nothing from it is copied or linked.
 
 ## Manual / hardware test: `profinet_loopback`
 
