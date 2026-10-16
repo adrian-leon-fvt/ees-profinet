@@ -7,20 +7,20 @@ Copy-paste patterns. All snippets assume:
 namespace pn = profinet;
 ```
 
-- [Clean shutdown on Ctrl-C](#clean-shutdown-on-ctrl-c)
-- [Consume cyclic IO data](#consume-cyclic-io-data)
-- [Produce cyclic IO data](#produce-cyclic-io-data)
-- [Walk DCP blocks](#walk-dcp-blocks)
-- [Answer DCP Identify](#answer-dcp-identify)
-- [Discover devices (DCP Identify-All)](#discover-devices-dcp-identify-all)
-- [Integrate with your own epoll loop](#integrate-with-your-own-epoll-loop)
-- [Hand frames to a worker thread](#hand-frames-to-a-worker-thread)
-- [Send and receive LLDP](#send-and-receive-lldp)
-- [Answer RPC Connect (device side)](#answer-rpc-connect-device-side)
-- [Send an RPC request (controller side)](#send-an-rpc-request-controller-side)
-- [VLAN tagging](#vlan-tagging)
-- [Several interfaces](#several-interfaces)
-- [Decode frames without a socket](#decode-frames-without-a-socket)
+- [Clean shutdown on Ctrl-C](cookbook.md#clean-shutdown-on-ctrl-c)
+- [Consume cyclic IO data](cookbook.md#consume-cyclic-io-data)
+- [Produce cyclic IO data](cookbook.md#produce-cyclic-io-data)
+- [Walk DCP blocks](cookbook.md#walk-dcp-blocks)
+- [Answer DCP Identify](cookbook.md#answer-dcp-identify)
+- [Discover devices (DCP Identify-All)](cookbook.md#discover-devices-dcp-identify-all)
+- [Integrate with your own epoll loop](cookbook.md#integrate-with-your-own-epoll-loop)
+- [Hand frames to a worker thread](cookbook.md#hand-frames-to-a-worker-thread)
+- [Send and receive LLDP](cookbook.md#send-and-receive-lldp)
+- [Answer RPC Connect (device side)](cookbook.md#answer-rpc-connect-device-side)
+- [Send an RPC request (controller side)](cookbook.md#send-an-rpc-request-controller-side)
+- [VLAN tagging](cookbook.md#vlan-tagging)
+- [Several interfaces](cookbook.md#several-interfaces)
+- [Decode frames without a socket](cookbook.md#decode-frames-without-a-socket)
 
 ## Clean shutdown on Ctrl-C
 

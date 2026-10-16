@@ -26,7 +26,7 @@ Two layers:
   interface. Receives frames, parses them with `frame.h`, and calls your hooks.
 
 Beside them, **`rpc.h`** handles connection management (CM) over UDP; see
-[RPC](#rpc-connection-management). It shares only `Bytes` with the layer-2 code.
+[RPC](concepts.md#rpc-connection-management). It shares only `Bytes` with the layer-2 code.
 
 ## Frame layout
 
