@@ -52,4 +52,5 @@ stack.run();   // or integrate stack.fd() in your epoll loop and call poll(0)
 ## Documentation
 
 Full usage docs in [`docs/`](docs/README.md): getting started, concepts,
-API reference, cookbook, testing, troubleshooting.
+cookbook, testing, troubleshooting. API reference: header comments, or
+`cmake --build build --target docs` (Doxygen, HTML in `build/html/`).

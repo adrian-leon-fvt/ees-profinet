@@ -23,6 +23,7 @@ ctest --test-dir build          # optional
 |---|---|---|---|
 | `PROFINET_BUILD_TESTS` | `ON` | `OFF` | GoogleTest unit tests, `profinet_loopback`, ctest entries |
 | `PROFINET_BUILD_EXAMPLES` | `ON` | `OFF` | `pn_sniff` example |
+| `PROFINET_BUILD_DOCS` | `ON` | `OFF` | `docs` target (Doxygen HTML in `build/html/`; needs Doxygen, skipped if missing). Undocumented public API fails it. |
 | `BUILD_SHARED_LIBS` | `OFF` | inherited | Build `libprofinet.so` instead of `.a` |
 
 ## Using it in your application
@@ -96,5 +97,6 @@ sudo build/pn_sniff eth0
 ## Next
 
 - How frames flow through the library: [concepts.md](concepts.md)
-- Every function and type: [api.md](api.md)
+- Every function and type: the headers in `include/profinet/`, or the
+  generated HTML (`cmake --build build --target docs`, open `build/html/index.html`)
 - Ready-made patterns: [cookbook.md](cookbook.md)

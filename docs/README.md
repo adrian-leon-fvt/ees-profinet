@@ -9,7 +9,7 @@ application also gets helpers to build and send frames.
 |---|---|
 | [getting-started.md](getting-started.md) | Build, install, link into your app, permissions, first program |
 | [concepts.md](concepts.md) | Architecture, frame layout, FrameID ranges, receive path, RPC, lifetimes, threading |
-| [api.md](api.md) | Full reference for `profinet/frame.h`, `profinet/lldp.h`, `profinet/stack.h` and `profinet/rpc.h` |
+| API reference | Doxygen comments in `include/profinet/*.h`; HTML via `cmake --build build --target docs` → `build/html/index.html` |
 | [cookbook.md](cookbook.md) | Recipes: DCP responder, cyclic IO, epoll/threads, VLAN, copying frames |
 | [testing.md](testing.md) | Unit tests, loopback test app, hardware testing, testing your own hooks |
 | [troubleshooting.md](troubleshooting.md) | Common errors and what they mean |
