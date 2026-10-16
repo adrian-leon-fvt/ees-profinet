@@ -27,134 +27,163 @@ namespace profinet
 /** @brief UUID in canonical (as-written, big-endian) byte order. */
 using Uuid = std::array<std::uint8_t, 16>;
 
+/** @brief UDP port a device (RPC server) listens on. */
 constexpr std::uint16_t k_rpc_port = 34964;
-/** @brief Range used for PROFINET's ephemeral RPC ports. */
+/** @name Ephemeral port range used by the side initiating a call */
+///@{
+/** @brief First ephemeral port. */
 constexpr std::uint16_t k_ephemeral_port_first = 49152;
-constexpr std::uint16_t k_ephemeral_port_last = 65535;
+constexpr std::uint16_t k_ephemeral_port_last = 65535; ///< Last ephemeral port.
+///@}
 
 /** @brief PNIO RPC interface UUIDs (DEA0000x-6C97-11D1-8271-00A02442DF7D). */
 namespace rpc_interface
 {
+/** @name PNIO RPC interface UUIDs */
+///@{
+/** @brief IO device interface (DEA00001-...). */
 constexpr Uuid k_device{0xDE, 0xA0, 0x00, 0x01, 0x6C, 0x97, 0x11, 0xD1,
                         0x82, 0x71, 0x00, 0xA0, 0x24, 0x42, 0xDF, 0x7D};
+/** @brief IO controller interface (DEA00002-...). */
 constexpr Uuid k_controller{0xDE, 0xA0, 0x00, 0x02, 0x6C, 0x97, 0x11, 0xD1,
                             0x82, 0x71, 0x00, 0xA0, 0x24, 0x42, 0xDF, 0x7D};
+/** @brief IO supervisor interface (DEA00003-...). */
 constexpr Uuid k_supervisor{0xDE, 0xA0, 0x00, 0x03, 0x6C, 0x97, 0x11, 0xD1,
                             0x82, 0x71, 0x00, 0xA0, 0x24, 0x42, 0xDF, 0x7D};
+/** @brief Parameter server interface (DEA00004-...). */
 constexpr Uuid k_parameter_server{0xDE, 0xA0, 0x00, 0x04, 0x6C, 0x97, 0x11, 0xD1,
                                   0x82, 0x71, 0x00, 0xA0, 0x24, 0x42, 0xDF, 0x7D};
+///@}
 } // namespace rpc_interface
 
 /** @brief DCE/RPC connectionless packet types. */
 namespace rpc_ptype
 {
-constexpr std::uint8_t k_request = 0;
-constexpr std::uint8_t k_ping = 1;
-constexpr std::uint8_t k_response = 2;
-constexpr std::uint8_t k_fault = 3;
-constexpr std::uint8_t k_working = 4;
-constexpr std::uint8_t k_nocall = 5;
-constexpr std::uint8_t k_reject = 6;
-constexpr std::uint8_t k_ack = 7;
-constexpr std::uint8_t k_fack = 9;
+/** @name Packet types (RpcHeader::ptype) */
+///@{
+constexpr std::uint8_t k_request = 0; ///< Call.
+constexpr std::uint8_t k_ping = 1; ///< Client asks if call is alive.
+constexpr std::uint8_t k_response = 2; ///< Reply to a request.
+constexpr std::uint8_t k_fault = 3; ///< Server-side call failure.
+constexpr std::uint8_t k_working = 4; ///< Reply to ping: still processing.
+constexpr std::uint8_t k_nocall = 5; ///< Reply to ping: call unknown.
+constexpr std::uint8_t k_reject = 6; ///< Call rejected (protocol error).
+constexpr std::uint8_t k_ack = 7; ///< Client acknowledges a response.
+constexpr std::uint8_t k_fack = 9; ///< Fragment acknowledgement.
+///@}
 } // namespace rpc_ptype
 
 /** @brief DCE/RPC flags1 bits. */
 namespace rpc_flags1
 {
-constexpr std::uint8_t k_last_fragment = 0x02;
-constexpr std::uint8_t k_fragment = 0x04;
+/** @name Flag bits (RpcHeader::flags1) */
+///@{
+constexpr std::uint8_t k_last_fragment = 0x02; ///< Last fragment of the body.
+constexpr std::uint8_t k_fragment = 0x04; ///< Body is fragmented.
+/** @brief Sender does not want fragment acks. */
 constexpr std::uint8_t k_no_fack = 0x08;
-constexpr std::uint8_t k_maybe = 0x10;
+constexpr std::uint8_t k_maybe = 0x10; ///< No response expected.
+/** @brief Call may be executed more than once. */
 constexpr std::uint8_t k_idempotent = 0x20;
-constexpr std::uint8_t k_broadcast = 0x40;
+constexpr std::uint8_t k_broadcast = 0x40; ///< Broadcast call.
+///@}
 } // namespace rpc_flags1
 
 /** @brief PNIO operation numbers. */
 namespace pnio_opnum
 {
-constexpr std::uint16_t k_connect = 0;
-constexpr std::uint16_t k_release = 1;
-constexpr std::uint16_t k_read = 2;
-constexpr std::uint16_t k_write = 3;
-constexpr std::uint16_t k_control = 4;
-constexpr std::uint16_t k_read_implicit = 5;
+/** @name Operation numbers (RpcHeader::opnum) */
+///@{
+constexpr std::uint16_t k_connect = 0; ///< Establish an AR.
+constexpr std::uint16_t k_release = 1; ///< Release an AR.
+constexpr std::uint16_t k_read = 2; ///< Read record data.
+constexpr std::uint16_t k_write = 3; ///< Write record data.
+constexpr std::uint16_t k_control = 4; ///< PrmEnd, ApplicationReady, ...
+constexpr std::uint16_t k_read_implicit = 5; ///< Read without an AR.
+///@}
 } // namespace pnio_opnum
 
 /** @brief Common PNIO block types (responses = request | 0x8000). */
 namespace pnio_block
 {
-constexpr std::uint16_t k_iod_write_req_header = 0x0008;
-constexpr std::uint16_t k_iod_read_req_header = 0x0009;
-constexpr std::uint16_t k_ar_block_req = 0x0101;
-constexpr std::uint16_t k_iocr_block_req = 0x0102;
-constexpr std::uint16_t k_alarm_cr_block_req = 0x0103;
+/** @name Block types */
+///@{
+constexpr std::uint16_t k_iod_write_req_header = 0x0008; ///< IODWriteReqHeader.
+constexpr std::uint16_t k_iod_read_req_header = 0x0009; ///< IODReadReqHeader.
+constexpr std::uint16_t k_ar_block_req = 0x0101; ///< ARBlockReq.
+constexpr std::uint16_t k_iocr_block_req = 0x0102; ///< IOCRBlockReq.
+constexpr std::uint16_t k_alarm_cr_block_req = 0x0103; ///< AlarmCRBlockReq.
+/** @brief ExpectedSubmoduleBlockReq. */
 constexpr std::uint16_t k_expected_submodule_block_req = 0x0104;
 constexpr std::uint16_t k_iod_control_req = 0x0110;     ///< PrmEnd
 constexpr std::uint16_t k_iox_control_req = 0x0112;     ///< ApplicationReady
-constexpr std::uint16_t k_release_block_req = 0x0114;
+constexpr std::uint16_t k_release_block_req = 0x0114; ///< ReleaseBlockReq.
+/** @brief OR into a request type to get the response type. */
 constexpr std::uint16_t k_response_bit = 0x8000;
+///@}
 } // namespace pnio_block
 
 /** @brief PNIOStatus: ErrorCode, ErrorDecode, ErrorCode1, ErrorCode2. */
 using PnioStatus = std::array<std::uint8_t, 4>;
+/** @brief Success status. */
 constexpr PnioStatus k_pnio_ok{0, 0, 0, 0};
 
 /** @brief DCE/RPC connectionless header (80 bytes on the wire). */
 struct RpcHeader
 {
-    std::uint8_t ptype = rpc_ptype::k_request;
-    std::uint8_t flags1 = rpc_flags1::k_idempotent;
-    std::uint8_t flags2 = 0;
-    Uuid object{};
-    Uuid interface{};
-    Uuid activity{};
-    std::uint32_t server_boot = 0;
-    std::uint32_t interface_version = 1;
-    std::uint32_t sequence = 0;
-    std::uint16_t opnum = 0;
-    std::uint16_t interface_hint = 0xFFFF;
-    std::uint16_t activity_hint = 0xFFFF;
-    std::uint16_t fragment_number = 0;
+    std::uint8_t ptype = rpc_ptype::k_request;      ///< rpc_ptype::k_*.
+    std::uint8_t flags1 = rpc_flags1::k_idempotent; ///< rpc_flags1 bits.
+    std::uint8_t flags2 = 0;                        ///< Unused by PNIO.
+    Uuid object{};    ///< Target object; see make_pnio_object_uuid().
+    Uuid interface{}; ///< rpc_interface::k_*.
+    Uuid activity{};  ///< Client call identity; random per client.
+    std::uint32_t server_boot = 0; ///< Server boot time; 0 in requests.
+    std::uint32_t interface_version = 1; ///< 1 for PNIO.
+    std::uint32_t sequence = 0; ///< Call number within the activity.
+    std::uint16_t opnum = 0;    ///< pnio_opnum::k_*.
+    std::uint16_t interface_hint = 0xFFFF; ///< 0xFFFF = no hint.
+    std::uint16_t activity_hint = 0xFFFF;  ///< 0xFFFF = no hint.
+    std::uint16_t fragment_number = 0;     ///< Always 0 (no fragmentation).
 };
 
 /** @brief Parsed RPC datagram; @p body spans the receive buffer. */
 struct RpcPacket
 {
-    RpcHeader header;
+    RpcHeader header; ///< Decoded header (host byte order).
     bool little_endian = true; ///< Sender's integer representation (drep).
-    Bytes body;
+    Bytes body; ///< After the 80-byte header (hook lifetime).
 };
 
 /** @brief NDR-wrapped request arguments (Connect/Read/Write/Control). */
 struct NdrRequest
 {
-    std::uint32_t args_maximum = 0;
+    std::uint32_t args_maximum = 0; ///< Max response size the caller accepts.
     Bytes args; ///< PNIO blocks.
 };
 
 /** @brief NDR-wrapped response arguments. */
 struct NdrResponse
 {
-    PnioStatus status{};
-    std::uint32_t args_maximum = 0;
+    PnioStatus status{};            ///< k_pnio_ok on success.
+    std::uint32_t args_maximum = 0; ///< Echo of the request's value.
     Bytes args; ///< PNIO blocks.
 };
 
 /** @brief One PNIO block; @p content spans the input buffer. */
 struct PnioBlock
 {
-    std::uint16_t type = 0;
-    std::uint8_t version_high = 1;
-    std::uint8_t version_low = 0;
+    std::uint16_t type = 0;        ///< pnio_block::k_* (big-endian on wire).
+    std::uint8_t version_high = 1; ///< BlockVersionHigh.
+    std::uint8_t version_low = 0;  ///< BlockVersionLow.
     Bytes content; ///< After BlockVersionLow.
 };
 
 /** @brief IPv4 address + UDP port. */
 struct Ipv4Endpoint
 {
-    std::array<std::uint8_t, 4> ip{};
-    std::uint16_t port = k_rpc_port;
+    std::array<std::uint8_t, 4> ip{}; ///< Network order, e.g. {192,168,0,10}.
+    std::uint16_t port = k_rpc_port;  ///< Host order.
+    /** @brief Equal if ip and port match. */
     bool operator==(const Ipv4Endpoint &) const = default;
 };
 
