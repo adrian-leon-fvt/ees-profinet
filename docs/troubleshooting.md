@@ -17,5 +17,9 @@
 | Garbage / crash after hook returns | Kept a `Bytes` span from `FrameView` | Copy the data inside the hook ([concepts.md#lifetimes](concepts.md#lifetimes)) |
 | `run()` doesn't return after `stop()` | `stop()` was called before `run()` started | Call `stop()` only after `run()` is running, or use `poll()` with your own flag |
 | Exception escapes `run()` | A hook threw | Catch inside the hook, or around `run()` and call it again |
+| `RpcEndpoint` throws `bind: Address already in use` | Another process (or a second endpoint) owns UDP 34964 | One device endpoint per host/IP; pass `bind_ip`, or use port `0` for client endpoints |
+| RPC hook never fires, Connect times out | Firewall drops UDP 34964 / 49152–65535, or peer sends to another IP | `sudo tcpdump -i <if> udp port 34964`; open the ports (`nft`/`ufw`) |
+| RPC response ignored by peer | `activity`/`sequence` not copied, or wrong `server_boot` | Answer with `reply()` (uses `make_response()`) |
+| Large Read/Write responses lost | No DCE/RPC fragmentation; datagram exceeds path MTU and IP fragments are dropped | Keep bodies < ~1400 bytes, or allow IP fragments on the path |
 | Cyclic data jitter | Linux scheduling | `SCHED_FIFO`, CPU isolation, PREEMPT_RT kernel; disable NIC interrupt coalescing (`ethtool -C <if> rx-usecs 0`) |
 | Integration test skipped | User namespaces disabled | Run `profinet_loopback` manually with `sudo` |

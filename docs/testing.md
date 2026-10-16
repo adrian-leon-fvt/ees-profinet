@@ -7,6 +7,7 @@ test/
 ├── unit/                     GoogleTest, no privileges, no network
 │   ├── test_frame.cpp        parse/build/APDU/DCP
 │   ├── test_lldp.cpp         LLDP TLV parse/build
+│   ├── test_rpc.cpp          DCE/RPC header (LE + hand-encoded BE), NDR, blocks, UDP request/reply on 127.0.0.1
 │   └── test_stack.cpp        hook dispatch, poll/run/stop (socketpair)
 └── integration/
     ├── profinet_loopback.cpp manual test app: TX on one interface, RX on another
