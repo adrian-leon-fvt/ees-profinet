@@ -57,7 +57,6 @@ if(PROFINET_BUILD_DOCS)
         set(DOXYGEN_WARN_AS_ERROR YES)
         set(DOXYGEN_EXCLUDE_SYMBOLS "detail")
         set(DOXYGEN_GENERATE_TREEVIEW YES)
-        set(DOXYGEN_DISTRIBUTE_GROUP_DOC YES)
         doxygen_add_docs(docs
             ${CMAKE_CURRENT_SOURCE_DIR}/include
             ${CMAKE_CURRENT_SOURCE_DIR}/docs

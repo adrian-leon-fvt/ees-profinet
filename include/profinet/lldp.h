@@ -35,15 +35,15 @@ namespace lldp_tlv
 {
 /** @name IEEE 802.1AB TLV types */
 ///@{
-constexpr std::uint8_t k_end = 0;
-constexpr std::uint8_t k_chassis_id = 1;
-constexpr std::uint8_t k_port_id = 2;
-constexpr std::uint8_t k_ttl = 3;
-constexpr std::uint8_t k_port_description = 4;
-constexpr std::uint8_t k_system_name = 5;
-constexpr std::uint8_t k_system_description = 6;
-constexpr std::uint8_t k_system_capabilities = 7;
-constexpr std::uint8_t k_management_address = 8;
+constexpr std::uint8_t k_end = 0; ///< End of LLDPDU.
+constexpr std::uint8_t k_chassis_id = 1; ///< Chassis ID (mandatory).
+constexpr std::uint8_t k_port_id = 2; ///< Port ID (mandatory).
+constexpr std::uint8_t k_ttl = 3; ///< Time to live (mandatory).
+constexpr std::uint8_t k_port_description = 4; ///< Port description.
+constexpr std::uint8_t k_system_name = 5; ///< System name.
+constexpr std::uint8_t k_system_description = 6; ///< System description.
+constexpr std::uint8_t k_system_capabilities = 7; ///< System capabilities.
+constexpr std::uint8_t k_management_address = 8; ///< Management address.
 /** @brief Value layout: `OUI(3) | subtype(1) | info`. */
 constexpr std::uint8_t k_org_specific = 127;
 ///@}
