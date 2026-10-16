@@ -29,7 +29,10 @@ TEST(Dispatcher, FeedParsesAndRunsMatchingHooksOnly)
         [&](const FrameView &) { ++cyclic; });
     const std::uint8_t payload[] = {1, 2, 3};
 
-    EXPECT_TRUE(d.feed(build(k_dst, k_src, frame_id::k_dcp_identify_req, payload)));
+    const auto frame =
+        build(k_dst, k_src, frame_id::k_dcp_identify_req, payload);
+
+    EXPECT_TRUE(d.feed(frame));
 
     EXPECT_EQ(dcp, 1);
     EXPECT_EQ(cyclic, 0);
