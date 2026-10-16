@@ -5,11 +5,14 @@ Run via run_e2e.sh, which creates the veth pair and sets PN_DEVICE.
 
 import os
 import subprocess
+import time
 
 import pytest
 from profinet import dcp
 from profinet.exceptions import PNIOError
-from profinet.rpc import RPCCon
+from profinet.cyclic import CyclicController
+from profinet.rpc import IOCRSetup, IOSlot, RPCCon
+from profinet.rt import build_iocr_configs
 from profinet.util import ethernet_socket, get_mac
 
 CTL_IF = "pn_ctl"
@@ -19,18 +22,36 @@ DEV_NAME = "ees-e2e-dev"
 TIMEOUT = 1
 
 
+def sh(cmd):
+    subprocess.run(cmd, shell=True, check=True)
+
+
 @pytest.fixture
 def device():
-    """Fresh device process per test so Set/Write can't leak between tests."""
+    """Fresh device per test, in its own netns on a fresh veth pair.
+
+    Own netns: device and controller both need UDP port 34964 (the device
+    sends ApplicationReady there), and one netns would also short-circuit
+    RPC over loopback. Killing the device drops the netns and the veth.
+    """
+    sh(f"ip link add name {DEV_IF} type veth peer name {CTL_IF}")
+    sh(f"ip addr add 10.0.0.1/24 dev {CTL_IF} && ip link set {CTL_IF} up")
+    script = (
+        f"while ! ip link show {DEV_IF} >/dev/null 2>&1; do sleep 0.02; done;"
+        f"ip link set lo up; ip addr add {DEV_IP}/24 dev {DEV_IF}; ip link set {DEV_IF} up;"
+        f'exec "$0" {DEV_IF} {DEV_IP} {DEV_NAME}'
+    )
     proc = subprocess.Popen(
-        [os.environ["PN_DEVICE"], DEV_IF, DEV_IP, DEV_NAME],
+        ["unshare", "-n", "sh", "-c", script, os.environ["PN_DEVICE"]],
         stdout=subprocess.PIPE,
         text=True,
     )
+    sh(f"ip link set {DEV_IF} netns {proc.pid}")
     assert proc.stdout.readline().strip() == "ready"
     yield proc
     proc.terminate()
     proc.wait(timeout=5)
+    sh(f"ip link del {CTL_IF} 2>/dev/null || true")
 
 
 @pytest.fixture
@@ -111,3 +132,45 @@ def test_write_then_read(ctl):
     with RPCCon(only_device(ctl), timeout=TIMEOUT) as con:
         con.write(api=0, slot=0, subslot=1, idx=0x1234, data=b"\x01\x02\x03")
         assert con.read_implicit(api=0, slot=0, subslot=1, idx=0x1234).payload == b"\x01\x02\x03"
+
+
+SLOT = IOSlot(slot=1, subslot=1, input_length=4, output_length=4)
+SETUP = IOCRSetup(slots=[SLOT], reduction_ratio=8, watchdog_factor=20)  # 8 ms cycle
+
+
+@pytest.fixture
+def ar(ctl):
+    """Connected AR through PrmEnd and ApplicationReady."""
+    _, mac = ctl
+    with RPCCon(only_device(ctl), timeout=TIMEOUT) as con:
+        result = con.connect(src_mac=mac, iocr_setup=SETUP)
+        con.prm_end()
+        con.application_ready(timeout=3)
+        yield con, result, ctl
+
+
+def test_connect_assigns_frame_ids_and_alarm_ref(ctl):
+    with RPCCon(only_device(ctl), timeout=TIMEOUT) as con:
+        r = con.connect(src_mac=ctl[1], iocr_setup=SETUP)
+        assert (r.input_frame_id, r.output_frame_id, r.device_alarm_ref) == (0xC001, 0xC100, 1)
+
+
+def test_connect_prm_end_application_ready(ar):
+    pass  # the fixture is the test: each step raises on timeout or error
+
+
+def test_cyclic_echoes_outputs_into_inputs(ar):
+    con, r, (_, mac) = ar
+    dev_mac = bytes.fromhex(only_device(ar[2]).mac.replace(":", ""))
+    inp, out = build_iocr_configs([SLOT], r.input_frame_id, r.output_frame_id, reduction_ratio=8, watchdog_factor=20)
+    with CyclicController(CTL_IF, mac, dev_mac, inp, out) as cyc:
+        cyc.set_output_data(1, 1, b"\xde\xad\xbe\xef")
+        deadline = time.time() + 3
+        while time.time() < deadline and (
+            cyc.get_input_data(1, 1) != b"\xde\xad\xbe\xef" or cyc.stats.frames_received < 10
+        ):
+            time.sleep(0.01)
+        assert cyc.get_input_data(1, 1) == b"\xde\xad\xbe\xef"
+        assert cyc.stats.frames_received >= 10
+        assert cyc.stats.frames_invalid == 0
+        assert cyc.is_input_good(1, 1)

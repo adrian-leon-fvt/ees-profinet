@@ -17,7 +17,7 @@ test/
 └── e2e/                      end-to-end against an independent controller (profinet-py)
     ├── e2e_device.cpp        minimal IO-Device on Stack + RpcEndpoint
     ├── test_e2e.py           pytest: profinet-py drives the device
-    ├── run_e2e.sh            veth pair + user netns, then pytest (ctest)
+    ├── run_e2e.sh            user netns, then pytest (ctest); fixture adds veth + device netns
     └── requirements.txt      profinet-py, pytest
 ```
 
@@ -62,15 +62,17 @@ test/e2e/run_e2e.sh build/linux/profinet_e2e_device .venv/bin/python -v -k read
 | Get name / IP | `get_param` | DCP Get (unicast 0xFEFD) |
 | Set name / IP, Signal | `set_param`, `set_ip`, `signal_device` | DCP Set + Control/Response |
 | Read implicit, unknown index, Write | `RPCCon.read_implicit`, `write` | `RpcEndpoint`, RPC header, NDR, blocks, PNIO status |
+| Connect, PrmEnd, ApplicationReady | `connect`, `prm_end`, `application_ready` | `RpcEndpoint` as client and server, block build/parse |
+| Cyclic IO echo | `CyclicController` | `Stack` range hook, `cyclic_data`, `build` with VLAN |
 
-Each test starts a fresh device process, so Set/Write never leak between
-tests. Skipped (exit 77) if `PROFINET_E2E_PYTHON` can't import
-`profinet` and `pytest`, or user namespaces are off. Takes ~8 s.
+Each test starts a fresh device process in its own network namespace (both
+sides need UDP 34964), so state never leaks between tests. Skipped (exit 77) if `PROFINET_E2E_PYTHON` can't import
+`profinet` and `pytest`, or user namespaces are off. Takes ~13 s.
 
 Limits:
 
-- No AR (Connect), cyclic IO or alarms: the test device doesn't implement
-  the CM state machine, so these can't be driven yet.
+- Test device is a toy CM: one AR, one fixed submodule (4 bytes in/out),
+  outputs echoed to inputs. No alarms yet.
 - profinet-py is lenient: it ignores response UUIDs and NDR ArgsLength, so
   those are covered only by unit tests. DCP XIDs are checked
   (`strict_xid=True`).
