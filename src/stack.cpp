@@ -79,6 +79,10 @@ Stack::Stack(const std::string &interface_name)
 Stack::Stack(const int fd, const Mac &mac, const int ifindex)
     : fd_(fd), ifindex_(ifindex), mac_(mac)
 {
+    sockaddr_storage addr{};
+    socklen_t len = sizeof(addr);
+    connected_ = ::getsockname(fd_, reinterpret_cast<sockaddr *>(&addr), &len) == 0 &&
+                 addr.ss_family != AF_PACKET;
 }
 
 Stack::~Stack()
@@ -210,6 +214,14 @@ void Stack::send(
 
 void Stack::send_raw(const Bytes frame)
 {
+    if (connected_)
+    {
+        if (::send(fd_, frame.data(), frame.size(), 0) < 0)
+        {
+            fail("send");
+        }
+        return;
+    }
     sockaddr_ll to{};
     to.sll_family = AF_PACKET;
     to.sll_ifindex = ifindex_;

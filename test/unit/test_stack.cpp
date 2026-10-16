@@ -126,6 +126,23 @@ TEST_F(StackTest, PollTimesOutWithNothingPending)
     EXPECT_EQ(stack_->poll(0), 0);
 }
 
+TEST_F(StackTest, SendOnAdoptedSocketReachesPeerWithOwnMacAsSource)
+{
+    const std::uint8_t payload[] = {1, 2, 3};
+
+    stack_->send(k_dst, frame_id::k_dcp_identify_rsp, payload);
+
+    std::uint8_t buf[128];
+    const ssize_t n = ::recv(peer_, buf, sizeof(buf), MSG_DONTWAIT);
+    ASSERT_EQ(n, 60);
+    const auto f = parse(Bytes(buf, static_cast<std::size_t>(n)));
+    ASSERT_TRUE(f);
+    EXPECT_EQ(f->src, k_src);
+    EXPECT_EQ(f->dst, k_dst);
+    EXPECT_EQ(f->frame_id, frame_id::k_dcp_identify_rsp);
+    EXPECT_EQ(f->payload[2], 3);
+}
+
 TEST_F(StackTest, StopFromHookEndsRun)
 {
     int calls = 0;

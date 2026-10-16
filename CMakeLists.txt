@@ -9,6 +9,7 @@ add_library(profinet::profinet ALIAS profinet)
 target_include_directories(profinet PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
+target_compile_features(profinet PUBLIC cxx_std_20)
 target_compile_options(profinet PRIVATE -Wall -Wextra)
 
 include(GNUInstallDirs)

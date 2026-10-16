@@ -1,0 +1,341 @@
+# Cookbook
+
+Copy-paste patterns. All snippets assume:
+
+```cpp
+#include "profinet/stack.h"
+namespace pn = profinet;
+```
+
+- [Clean shutdown on Ctrl-C](#clean-shutdown-on-ctrl-c)
+- [Consume cyclic IO data](#consume-cyclic-io-data)
+- [Produce cyclic IO data](#produce-cyclic-io-data)
+- [Walk DCP blocks](#walk-dcp-blocks)
+- [Answer DCP Identify](#answer-dcp-identify)
+- [Discover devices (DCP Identify-All)](#discover-devices-dcp-identify-all)
+- [Integrate with your own epoll loop](#integrate-with-your-own-epoll-loop)
+- [Hand frames to a worker thread](#hand-frames-to-a-worker-thread)
+- [VLAN tagging](#vlan-tagging)
+- [Several interfaces](#several-interfaces)
+- [Decode frames without a socket](#decode-frames-without-a-socket)
+
+## Clean shutdown on Ctrl-C
+
+`stop()` is an atomic store, so it is safe in a signal handler.
+
+```cpp
+#include <csignal>
+
+pn::Stack *g_stack = nullptr;
+
+int main()
+{
+    pn::Stack stack("eth0");
+    g_stack = &stack;
+    std::signal(SIGINT, [](int) { g_stack->stop(); });
+    std::signal(SIGTERM, [](int) { g_stack->stop(); });
+    stack.run();
+}
+```
+
+## Consume cyclic IO data
+
+Check `DataValid` (bit 2) and `ProviderState` (bit 4 = RUN) before using the
+data. Watch the cycle counter to detect a stalled provider.
+
+```cpp
+constexpr std::uint8_t k_data_valid = 1u << 2;
+constexpr std::uint8_t k_provider_run = 1u << 4;
+
+stack.on(0xC001, [&](const pn::FrameView &f) {
+    const auto status = pn::parse_apdu_status(f);
+    if (!status || !(status->data_status & k_data_valid) ||
+        !(status->data_status & k_provider_run))
+    {
+        return;
+    }
+    const pn::Bytes io = pn::cyclic_data(f);
+    // The layout of `io` (IOPS/IOCS bytes, submodule data) comes from the
+    // connection setup (CM). Example: first input byte + its IOPS.
+    const std::uint8_t input0 = io[0];
+    const std::uint8_t iops0 = io[1];
+    (void)input0;
+    (void)iops0;
+});
+```
+
+## Produce cyclic IO data
+
+The library does not time anything; you drive the cycle. `cycle_counter`
+counts in 31.25 µs units, so add `send_clock_factor * reduction_ratio` each
+cycle (32 for a 1 ms cycle).
+
+```cpp
+#include <chrono>
+#include <thread>
+
+void produce(pn::Stack &stack, const pn::Mac &controller, std::uint16_t frame_id)
+{
+    std::vector<std::uint8_t> payload(40, 0x00); // C_SDU, minimum 40 bytes
+    payload.resize(44);                          // + 4 bytes APDU status
+    std::uint16_t cycle = 0;
+    auto next = std::chrono::steady_clock::now();
+
+    for (;;)
+    {
+        // ... write your IO data + IOPS into payload[0..39] ...
+        cycle += 32;
+        payload[40] = static_cast<std::uint8_t>(cycle >> 8);
+        payload[41] = static_cast<std::uint8_t>(cycle);
+        payload[42] = 0x35; // State=primary, DataValid, ProviderState=RUN, no problem
+        payload[43] = 0x00; // TransferStatus OK
+        stack.send(controller, frame_id, payload, pn::Vlan{6, 0});
+
+        next += std::chrono::milliseconds(1);
+        std::this_thread::sleep_until(next);
+    }
+}
+```
+
+`sleep_until` on a stock kernel jitters by tens to hundreds of µs. For tight
+cycles use `SCHED_FIFO`, `isolcpus`, or a PREEMPT_RT kernel.
+
+## Walk DCP blocks
+
+```cpp
+#include <cstdio>
+
+void for_each_dcp_block(const pn::FrameView &f)
+{
+    const auto h = pn::parse_dcp(f);
+    if (!h)
+    {
+        return;
+    }
+    pn::Bytes blocks = f.payload.subspan(10);
+    if (blocks.size() > h->data_length)
+    {
+        blocks = blocks.first(h->data_length); // drop Ethernet padding
+    }
+    while (blocks.size() >= 4)
+    {
+        const std::uint8_t option = blocks[0];
+        const std::uint8_t suboption = blocks[1];
+        const std::size_t len = (blocks[2] << 8) | blocks[3];
+        if (blocks.size() < 4 + len)
+        {
+            break; // malformed
+        }
+        const pn::Bytes data = blocks.subspan(4, len);
+        std::printf("option %u/%u, %zu bytes\n", option, suboption, data.size());
+
+        const std::size_t step = 4 + len + (len & 1); // blocks are padded to even length
+        blocks = blocks.subspan(std::min(step, blocks.size()));
+    }
+}
+```
+
+Common options: `1/2` IP parameter, `2/1` vendor name, `2/2` NameOfStation,
+`2/3` DeviceID, `2/4` DeviceRole, `5/x` control, `0xFF/0xFF` all.
+
+## Answer DCP Identify
+
+Minimal device-side responder announcing a NameOfStation.
+Real devices must also honour the `response_delay` factor and filter on the
+requested NameOfStation; this sketch answers every request.
+
+```cpp
+void answer_identify(pn::Stack &stack, const std::string &name_of_station)
+{
+    stack.on(pn::frame_id::k_dcp_identify_req, [&stack, name_of_station](const pn::FrameView &f) {
+        const auto req = pn::parse_dcp(f);
+        if (!req || req->service_id != 5 || req->service_type != 0)
+        {
+            return;
+        }
+
+        std::vector<std::uint8_t> blocks;
+        auto put16 = [&](std::size_t v) {
+            blocks.push_back(static_cast<std::uint8_t>(v >> 8));
+            blocks.push_back(static_cast<std::uint8_t>(v));
+        };
+        // NameOfStation block: option 2, suboption 2, BlockInfo(2) + name
+        blocks.push_back(2);
+        blocks.push_back(2);
+        put16(2 + name_of_station.size());
+        put16(0); // BlockInfo
+        blocks.insert(blocks.end(), name_of_station.begin(), name_of_station.end());
+        if (blocks.size() & 1)
+        {
+            blocks.push_back(0);
+        }
+
+        std::vector<std::uint8_t> rsp{
+            5, 1, // Identify, response success
+            static_cast<std::uint8_t>(req->xid >> 24),
+            static_cast<std::uint8_t>(req->xid >> 16),
+            static_cast<std::uint8_t>(req->xid >> 8),
+            static_cast<std::uint8_t>(req->xid),
+            0, 0, // reserved
+            static_cast<std::uint8_t>(blocks.size() >> 8),
+            static_cast<std::uint8_t>(blocks.size())};
+        rsp.insert(rsp.end(), blocks.begin(), blocks.end());
+
+        stack.send(f.src, pn::frame_id::k_dcp_identify_rsp, rsp);
+    });
+}
+```
+
+## Discover devices (DCP Identify-All)
+
+```cpp
+#include <map>
+
+std::map<pn::Mac, std::vector<std::uint8_t>> discover(pn::Stack &stack)
+{
+    std::map<pn::Mac, std::vector<std::uint8_t>> found;
+    stack.on(pn::frame_id::k_dcp_identify_rsp, [&](const pn::FrameView &f) {
+        found[f.src].assign(f.payload.begin(), f.payload.end()); // copy: span dies after hook
+    });
+
+    const std::uint8_t identify_all[] = {
+        5, 0,                   // Identify request
+        0x00, 0x00, 0x10, 0x01, // Xid
+        0x00, 0x80,             // ResponseDelay factor
+        0x00, 0x04,             // DCPDataLength
+        0xFF, 0xFF, 0x00, 0x00  // All selector
+    };
+    stack.send({0x01, 0x0E, 0xCF, 0x00, 0x00, 0x00}, pn::frame_id::k_dcp_identify_req, identify_all);
+
+    for (int i = 0; i < 20; ++i) // ~2 s
+    {
+        stack.poll(100);
+    }
+    return found;
+}
+```
+
+The hook captures `found` by reference, and hooks can't be removed, so the
+`Stack` must not be polled after `discover()` returns. Use a dedicated `Stack`
+for discovery, or have the hook write into storage that outlives the stack.
+
+## Integrate with your own epoll loop
+
+Don't call `run()`. Watch `fd()` and call `poll(0)` when it is readable.
+
+```cpp
+#include <sys/epoll.h>
+
+void event_loop(pn::Stack &stack)
+{
+    const int ep = epoll_create1(0);
+    epoll_event ev{};
+    ev.events = EPOLLIN;
+    ev.data.fd = stack.fd();
+    epoll_ctl(ep, EPOLL_CTL_ADD, stack.fd(), &ev);
+    // ... add your timers, sockets, etc. ...
+
+    epoll_event events[16];
+    for (;;)
+    {
+        const int n = epoll_wait(ep, events, 16, -1);
+        for (int i = 0; i < n; ++i)
+        {
+            if (events[i].data.fd == stack.fd())
+            {
+                stack.poll(0); // drains all queued frames
+            }
+        }
+    }
+}
+```
+
+The same works with `select`, `poll`, Boost.Asio (`posix::stream_descriptor`
++ `async_wait`), libuv (`uv_poll_t`) or Qt (`QSocketNotifier`).
+
+## Hand frames to a worker thread
+
+Hooks run in the receive loop. For slow processing, copy and queue.
+
+```cpp
+#include <condition_variable>
+#include <deque>
+#include <mutex>
+
+struct FrameQueue
+{
+    std::mutex m;
+    std::condition_variable cv;
+    std::deque<std::vector<std::uint8_t>> q;
+
+    void push(pn::Bytes raw)
+    {
+        {
+            std::lock_guard lock(m);
+            q.emplace_back(raw.begin(), raw.end());
+        }
+        cv.notify_one();
+    }
+
+    std::vector<std::uint8_t> pop()
+    {
+        std::unique_lock lock(m);
+        cv.wait(lock, [&] { return !q.empty(); });
+        auto frame = std::move(q.front());
+        q.pop_front();
+        return frame;
+    }
+};
+
+// Receive thread:   stack.on_any([&](const pn::FrameView &f) { queue.push(f.raw); });
+// Worker thread:    auto raw = queue.pop(); auto f = pn::parse(raw); ...
+```
+
+With hardware VLAN offload, `raw` has no tag; copy `f.vlan` too if you need it.
+
+## VLAN tagging
+
+Receiving: `f.vlan` is set for tagged frames, whether the tag was in the
+frame or stripped by the NIC.
+
+Sending: pass a `Vlan`. PROFINET RT normally uses priority 6, VLAN 0
+("priority tagged"):
+
+```cpp
+stack.send(dst, 0xC001, payload, pn::Vlan{6, 0});
+```
+
+## Several interfaces
+
+One `Stack` per port. Run each in its own thread, or put all `fd()`s in one
+epoll set.
+
+```cpp
+#include <thread>
+
+void two_ports()
+{
+    pn::Stack port1("eth0");
+    pn::Stack port2("eth1");
+    // ... register hooks on each ...
+    std::thread t1([&] { port1.run(); });
+    std::thread t2([&] { port2.run(); });
+    t1.join();
+    t2.join();
+}
+```
+
+## Decode frames without a socket
+
+`frame.h` has no I/O. Decode captured bytes (pcap, logs, test vectors)
+directly:
+
+```cpp
+#include "profinet/frame.h"
+
+bool is_dcp_identify(const std::vector<std::uint8_t> &captured)
+{
+    const auto f = profinet::parse(captured);
+    return f && f->frame_id == profinet::frame_id::k_dcp_identify_req;
+}
+```

@@ -82,8 +82,9 @@ class Stack
   protected:
     /**
      * @brief Adopt an already-open socket (testing / privilege separation).
-     * @param fd Datagram socket delivering whole Ethernet frames; closed on
-     *           destruction.
+     * @param fd AF_PACKET socket, or a connected datagram socket (e.g.
+     *           socketpair) delivering whole Ethernet frames; closed on
+     *           destruction. Non-AF_PACKET sockets transmit with send().
      */
     Stack(int fd, const Mac &mac, int ifindex);
 
@@ -100,6 +101,7 @@ class Stack
 
     int fd_ = -1;
     int ifindex_ = 0;
+    bool connected_ = false; ///< Adopted non-AF_PACKET socket: plain send().
     Mac mac_{};
     std::vector<Entry> hooks_;
     std::atomic<bool> running_{false};

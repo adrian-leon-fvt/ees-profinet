@@ -47,3 +47,8 @@ stack.run();   // or integrate stack.fd() in your epoll loop and call poll(0)
 ```
 
 `FrameView` spans are valid only inside the hook. Example: `examples/pn_sniff.cpp`.
+
+## Documentation
+
+Full usage docs in [`docs/`](docs/README.md): getting started, concepts,
+API reference, cookbook, testing, troubleshooting.
