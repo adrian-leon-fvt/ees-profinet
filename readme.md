@@ -27,9 +27,13 @@ Presets: `cmake --preset linux` (full) or `cmake --preset portable`
 - `ctest --test-dir build -L e2e` — profinet-py (independent Python
   controller) drives a test device built on the lib; set
   `PROFINET_E2E_PYTHON` to a venv with `test/e2e/requirements.txt`.
-- `cmake --build build --target docs` — Doxygen HTML; fails on undocumented public API (also run in CI).
+- `cmake --build build --target docs` — Doxygen HTML; fails on undocumented public API.
 - Manual, on real hardware: `sudo build/profinet_loopback <tx_if> <rx_if>`
   with the two interfaces linked. Exit 0 = pass.
+
+Build/test/docs run locally, not in GitHub Actions. Enable the local pre-push
+hook once per clone with `git config --local core.hooksPath .githooks`,
+or run `sh .githooks/pre-push` manually. See [local checks](docs/testing.md#local-buildtestdocs-hook).
 
 ## Use
 
@@ -56,6 +60,9 @@ stack.run();   // or integrate stack.fd() in your epoll loop and call poll(0)
 ```
 
 `FrameView` spans are valid only inside the hook. Example: `examples/pn_sniff.cpp`.
+
+Read-only hardware demo: [Turck TBPN-L5-4FDI-4FDX](docs/turck-demo.md).
+Obtain its GSDML from Turck when engineering cyclic IO; discovery needs no GSDML.
 
 ## Documentation
 

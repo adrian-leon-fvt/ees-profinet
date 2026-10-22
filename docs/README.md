@@ -11,8 +11,9 @@ application also gets helpers to build and send frames.
 | [concepts.md](concepts.md) | Architecture, frame layout, FrameID ranges, receive path, RPC, lifetimes, threading |
 | API reference | Doxygen comments in `include/profinet/*.h`; HTML via `cmake --build build --target docs` → `build/html/index.html` |
 | [cookbook.md](cookbook.md) | Recipes: DCP responder, cyclic IO, epoll/threads, VLAN, copying frames |
-| [testing.md](testing.md) | Unit tests, loopback test app, hardware testing, testing your own hooks |
+| [testing.md](testing.md) | Local build/test/docs pre-push hook, unit tests, loopback and hardware testing |
 | [troubleshooting.md](troubleshooting.md) | Common errors and what they mean |
+| [turck-demo.md](turck-demo.md) | Read-only TBPN-L5-4FDI-4FDX discovery, Turck GSDML source, PROFIsafe integration boundary |
 
 ## Scope
 

@@ -38,6 +38,8 @@ if(PROFINET_BUILD_EXAMPLES AND PROFINET_POSIX)
     target_link_libraries(pn_sniff PRIVATE profinet)
     add_executable(pn_borrowed_fd examples/pn_borrowed_fd.cpp)
     target_link_libraries(pn_borrowed_fd PRIVATE profinet)
+    add_executable(pn_turck_demo examples/pn_turck_demo.cpp)
+    target_link_libraries(pn_turck_demo PRIVATE profinet)
 endif()
 # Uses only portable library parts; its own I/O is Linux, so host-only.
 if(PROFINET_BUILD_EXAMPLES AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -47,6 +49,10 @@ endif()
 
 if(PROFINET_BUILD_TESTS)
     enable_testing()
+    if(TARGET pn_turck_demo)
+        add_test(NAME turck_discovery_self_test COMMAND pn_turck_demo --self-test)
+        set_tests_properties(turck_discovery_self_test PROPERTIES LABELS unit TIMEOUT 5)
+    endif()
 
     find_package(GTest REQUIRED)
     add_executable(profinet_test test/unit/test_dispatcher.cpp test/unit/test_frame.cpp test/unit/test_lldp.cpp test/unit/test_rpc.cpp)
@@ -64,6 +70,14 @@ if(PROFINET_BUILD_TESTS)
             LABELS integration SKIP_RETURN_CODE 77 TIMEOUT 10)
 
         set(PROFINET_E2E_PYTHON python3 CACHE STRING "Python with profinet-py + pytest (test/e2e/requirements.txt)")
+        if(TARGET pn_turck_demo)
+            add_test(NAME turck_status_loopback
+                COMMAND ${PROFINET_E2E_PYTHON}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/test/integration/turck_status_loopback.py
+                    $<TARGET_FILE:pn_turck_demo>)
+            set_tests_properties(turck_status_loopback PROPERTIES
+                LABELS integration SKIP_RETURN_CODE 77 TIMEOUT 20)
+        endif()
         add_executable(profinet_e2e_device test/e2e/e2e_device.cpp)
         target_link_libraries(profinet_e2e_device PRIVATE profinet)
         add_test(NAME profinet_e2e

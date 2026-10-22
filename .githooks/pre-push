@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+cd "$(git rev-parse --show-toplevel)"
+if ! command -v doxygen >/dev/null 2>&1; then
+    printf '%s\n' 'Local checks require Doxygen; install it before pushing.' >&2
+    exit 1
+fi
+
+cmake --preset linux \
+    -DPROFINET_BUILD_TESTS=ON \
+    -DPROFINET_BUILD_EXAMPLES=ON \
+    -DPROFINET_BUILD_DOCS=ON
+cmake --build --preset linux --parallel 2
+ctest --preset linux
+cmake --build build/linux --target docs

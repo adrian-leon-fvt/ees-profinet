@@ -13,7 +13,8 @@ test/
 │   └── test_stack.cpp        receive loop, poll/run/stop, fd ownership (socketpair; POSIX only)
 ├── integration/
 │   ├── profinet_loopback.cpp manual test app: TX on one interface, RX on another
-│   └── loopback_netns.sh     runs it over a veth pair in a user netns (ctest)
+│   ├── loopback_netns.sh     runs it over a veth pair in a user netns (ctest)
+│   └── turck_status_loopback.py  independent UDP fixture for read-only Turck status demo
 └── e2e/                      end-to-end against an independent controller (profinet-py)
     ├── e2e_device.cpp        minimal IO-Device on Stack + RpcEndpoint
     ├── test_e2e.py           pytest: profinet-py drives the device
@@ -31,13 +32,45 @@ only the codec/dispatcher unit tests are built.
 cmake -S . -B build && cmake --build build -j
 ctest --test-dir build                    # everything
 ctest --test-dir build -L unit            # unit tests only
-ctest --test-dir build -L integration     # veth loopback only
+ctest --test-dir build -L integration     # veth and Turck status loopbacks
 build/profinet_test --gtest_filter='StackTest.*'   # run gtest directly
 ```
 
 The integration test needs unprivileged user namespaces
 (`unshare -rn`). Where they are disabled (some containers, hardened
 kernels), ctest reports it as **skipped**, not failed.
+
+## Local build/test/docs hook
+
+No build/test/docs workflow runs in GitHub Actions. Run the tracked hook
+manually or opt in once per clone:
+
+```sh
+sh .githooks/pre-push
+git config --local core.hooksPath .githooks
+```
+
+The hook configures the Linux preset with tests/examples/docs enabled, builds,
+runs CTest, and builds Doxygen docs. A failure blocks the push. Install CMake,
+a C++17 compiler, GoogleTest, Python 3 and Doxygen locally; the hook installs
+nothing and contacts no hardware. See below for optional profinet-py setup.
+Namespace/e2e tests retain their documented skip conditions; review CTest's
+skipped-test report. The Turck status fixture uses the Python standard library
+and skips if its loopback UDP endpoint is unavailable.
+
+`core.hooksPath` replaces the current hook directory; integrate with existing
+hooks instead if your clone already uses one. To undo this setting after
+enabling it, run `git config --local --unset core.hooksPath`.
+Hooks are local, not a server-side enforcement policy.
+
+## Turck demo checks
+
+`pn_turck_demo --self-test` checks DCP identity decoding and input-read request
+encoding without opening a socket. `turck_status_loopback.py` runs the demo
+against a Python-standard-library UDP fixture, checking request bytes,
+response correlation, decoded inputs, PNIO errors, malformed records and
+BAD provider quality. It never writes outputs. These are offline checks, not
+proof of compatibility with Turck firmware. See [bench demo](turck-demo.md).
 
 ## End-to-end: profinet-py
 
