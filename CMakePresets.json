@@ -30,6 +30,17 @@
                 "PROFINET_POSIX": "OFF"
             },
             "inherits": "base"
+        },
+        {
+            "name": "windows",
+            "displayName": "Windows (Winsock RPC + optional Npcap examples)",
+            "binaryDir": "${sourceDir}/build/windows",
+            "cacheVariables": {
+                "PROFINET_POSIX": "OFF",
+                "PROFINET_BUILD_TESTS": "OFF",
+                "PROFINET_BUILD_EXAMPLES": "ON"
+            },
+            "inherits": "base"
         }
     ],
     "buildPresets": [
@@ -40,6 +51,10 @@
         {
             "name": "portable",
             "configurePreset": "portable"
+        },
+        {
+            "name": "windows",
+            "configurePreset": "windows"
         }
     ],
     "testPresets": [
@@ -53,6 +68,13 @@
         {
             "name": "portable",
             "configurePreset": "portable",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "windows",
+            "configurePreset": "windows",
             "output": {
                 "outputOnFailure": true
             }

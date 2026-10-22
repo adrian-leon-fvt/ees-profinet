@@ -2,8 +2,9 @@
 
 ## Requirements
 
-- Linux (uses `AF_PACKET`, `PACKET_AUXDATA`).
-- C++17 compiler (GCC 8+, Clang 7+). Matches embedded toolchains such as
+- Linux for `Stack` (`AF_PACKET`, `PACKET_AUXDATA`), or Windows for Winsock
+  RPC and optional Npcap example discovery.
+- C++17 compiler (GCC 8+, Clang 7+, or Visual Studio 2022). Matches embedded toolchains such as
   IAR 9. The CMake target sets this for you (`cxx_std_17` is a public
   compile feature). `profinet::Bytes` is a minimal C++17 stand-in for
   `std::span<const std::uint8_t>`.
@@ -24,12 +25,21 @@ Or with presets (CMake 3.21+):
 |---|---|---|
 | `linux` | everything: codecs, `Dispatcher`, `Stack`, `RpcEndpoint`, examples | Linux hosts |
 | `portable` | codecs + `Dispatcher` only (`PROFINET_POSIX=OFF`) | MCU / RTOS targets (e.g. IAR + lwIP); you supply frame RX/TX and UDP |
+| `windows` | codecs, `Dispatcher`, Winsock `RpcEndpoint`, `pn_turck_demo`, `pn_dispatcher`, `pn_windows_udp` | Windows hosts; Npcap SDK enables Ethernet discovery |
 
 ```sh
 cmake --preset portable && cmake --build --preset portable && ctest --preset portable
 ```
 
-Presets export `compile_commands.json`; `.clangd` points clangd at
+On Windows:
+
+```sh
+cmake --preset windows
+cmake --build --preset windows --config Release
+```
+
+Ninja/Makefile presets export `compile_commands.json`; Visual Studio does not.
+`.clangd` points clangd at
 `build/linux` (run `cmake --preset linux` once). Edit `.clangd` to
 `build/portable` to see what an MCU build compiles.
 
@@ -40,7 +50,7 @@ so also pass `-DPROFINET_BUILD_TESTS=OFF` there).
 
 | Option | Default (top-level) | Default (`add_subdirectory`) | Effect |
 |---|---|---|---|
-| `PROFINET_POSIX` | `ON` | `ON` | `OFF` drops `stack.cpp`, `rpc_endpoint.cpp`, POSIX tests and examples, and doesn't install `stack.h`. Library then has no OS dependency. |
+| `PROFINET_POSIX` | `ON` | `ON` | `OFF` drops Linux `Stack`, POSIX tests/examples, and doesn't install `stack.h`. `RpcEndpoint` is built on Windows regardless (Winsock), otherwise only when `ON`. |
 | `PROFINET_BUILD_TESTS` | `ON` | `OFF` | GoogleTest unit tests, `profinet_loopback`, ctest entries |
 | `PROFINET_E2E_PYTHON` | `python3` | `python3` | Interpreter with profinet-py + pytest for the `e2e` ctest ([testing.md](testing.md)) |
 | `PROFINET_BUILD_EXAMPLES` | `ON` | `OFF` | `pn_sniff`, `pn_borrowed_fd`, `pn_dispatcher`, `pn_turck_demo` examples |
@@ -121,7 +131,15 @@ Same Identify-All, for the other socket-ownership modes
 | Example | Mode | Builds with |
 |---|---|---|
 | [`pn_borrowed_fd.cpp`](../examples/pn_borrowed_fd.cpp) | Your fd, library loop: `Stack(fd, mac, ifindex, BORROW)` | `linux` |
-| [`pn_dispatcher.cpp`](../examples/pn_dispatcher.cpp) | Fully yours: `Dispatcher::feed()` + `build()`; I/O in `eth_open/eth_rx/eth_tx`, swap those for an MCU driver | `linux` and `portable` |
+| [`pn_dispatcher.cpp`](../examples/pn_dispatcher.cpp) | Fully yours: `Dispatcher::feed()` + `build()`; Linux uses AF_PACKET, Windows uses Npcap when `NPCAP_SDK` is set | `linux`, `portable`, and `windows` |
+| [`pn_windows_udp.cpp`](../examples/pn_windows_udp.cpp) | Winsock loopback transport carrying complete Ethernet frames into `Dispatcher` | `windows` |
+| [`pn_turck_demo.cpp`](../examples/pn_turck_demo.cpp) | Read-only TURCK discovery and acyclic input reads | `linux`, `windows` |
+
+For live Windows Ethernet, install Npcap and its SDK, then set `NPCAP_SDK` to
+the SDK directory before configuring. Pass a friendly adapter name (for example
+`Ethernet 4`) to `pn_dispatcher`; use `--list` to list adapters.
+Without the SDK, discovery reports an explicit error, but TURCK `--status`
+uses Winsock without Npcap. See [Windows TURCK commands](turck-demo.md#native-windows).
 
 ## Next
 

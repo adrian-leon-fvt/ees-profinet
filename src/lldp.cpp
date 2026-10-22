@@ -88,7 +88,7 @@ std::vector<std::uint8_t> build_lldp(
     const Bytes extra_tlvs)
 {
     constexpr std::uint8_t k_locally_assigned = 7;
-    auto with_subtype = [](const std::string_view id) {
+    auto with_subtype = [k_locally_assigned](const std::string_view id) {
         std::vector<std::uint8_t> v{k_locally_assigned};
         v.insert(v.end(), id.begin(), id.end());
         return v;

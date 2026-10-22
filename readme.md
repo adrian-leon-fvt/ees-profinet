@@ -16,8 +16,12 @@ sudo cmake --install build   # optional
 Options (default ON when top-level, OFF when added via `add_subdirectory`):
 `PROFINET_BUILD_TESTS`, `PROFINET_BUILD_EXAMPLES`.
 
-Presets: `cmake --preset linux` (full) or `cmake --preset portable`
-(`PROFINET_POSIX=OFF`: codecs + `Dispatcher`, no OS I/O, for MCU/RTOS).
+Presets: `cmake --preset linux` (full), `cmake --preset portable`, or
+`cmake --preset windows`. Portable builds provide codecs + `Dispatcher`, no
+OS I/O. Windows adds Winsock `RpcEndpoint` and examples, including
+`pn_turck_demo`. Set `NPCAP_SDK` before configuring to enable live Ethernet
+discovery; see [Windows TURCK instructions](docs/turck-demo.md#native-windows).
+`Stack` remains Linux `AF_PACKET` only.
 
 ## Test
 

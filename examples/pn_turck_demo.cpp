@@ -3,9 +3,16 @@
  * @brief Read-only Turck discovery and acyclic input-status demo.
  */
 #include "profinet/rpc.h"
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#ifdef PROFINET_NPCAP
+#include "npcap_stack.h"
+#endif
+#else
 #include "profinet/stack.h"
-
 #include <arpa/inet.h>
+#endif
 
 #include <algorithm>
 #include <chrono>
@@ -424,16 +431,36 @@ int main(const int argc, char **argv)
         {
             return show_status(argv[2]);
         }
+#ifdef PROFINET_NPCAP
+        if (argc == 2 && std::string(argv[1]) == "--list")
+        {
+            profinet_example::NpcapStack::list();
+            return 0;
+        }
+#endif
         if (argc != 2)
         {
             std::fprintf(
                 stderr,
-                "usage: %s <interface> | --status <ip> | --self-test\n",
+                "usage: %s <interface> | --status <ip> | --self-test"
+#ifdef PROFINET_NPCAP
+                " | --list"
+#endif
+                "\n",
                 argv[0]);
             return 1;
         }
 
+#if defined(_WIN32) && !defined(PROFINET_NPCAP)
+        throw std::runtime_error(
+            "Discovery requires the Npcap SDK at build time and Npcap runtime. "
+            "Set NPCAP_SDK, reconfigure and rebuild. --status needs no Npcap.");
+#else
+#ifdef PROFINET_NPCAP
+        profinet_example::NpcapStack stack(argv[1]);
+#else
         pn::Stack stack(argv[1]);
+#endif
         bool found = false;
         stack.on(
             pn::frame_id::k_dcp_identify_rsp, [&](const pn::FrameView &frame) {
@@ -488,6 +515,7 @@ int main(const int argc, char **argv)
             return 2;
         }
         return 0;
+#endif
     }
     catch (const std::exception &error)
     {

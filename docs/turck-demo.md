@@ -45,7 +45,33 @@ sudo build/linux/pn_turck_demo eth0
 ```
 
 Replace `eth0` with the dedicated interface. `CAP_NET_RAW` is needed for the
-hardware run, not the self-test. Expected reply shape (MAC is illustrative):
+Linux hardware run, not the self-test.
+
+### Native Windows
+
+Install the [Npcap runtime](https://npcap.com/#download) and extract its SDK.
+Npcap is required only for Ethernet discovery; `--status` uses native Winsock.
+Run from PowerShell with Visual Studio C++ build tools and CMake installed:
+
+```powershell
+$env:NPCAP_SDK = 'C:\path\to\npcap-sdk'
+cmake --preset windows
+cmake --build --preset windows --config Release
+.\build\windows\Release\pn_turck_demo.exe --self-test
+.\build\windows\Release\pn_turck_demo.exe --list
+.\build\windows\Release\pn_turck_demo.exe 'Ethernet 4'
+.\build\windows\Release\pn_turck_demo.exe --status 192.168.1.100
+```
+
+Use the friendly adapter name or full Npcap device name printed by `--list`.
+MSVC builds load Npcap from the Windows system directory; no PATH changes or
+DLL copying are needed. Other Windows compilers require the runtime's Npcap
+directory on PATH. If Npcap was installed with administrator-only capture,
+run discovery from an elevated terminal. Keep the NIC on a dedicated bench
+network. Without the SDK, `--self-test` and `--status` still work, but Ethernet
+discovery reports the missing build dependency.
+
+Expected reply shape on either platform (MAC is illustrative):
 
 ```text
 Sending read-only DCP Identify-All; waiting 2 seconds.
@@ -58,13 +84,14 @@ not count as a match. A missing reply usually means wrong interface, missing
 power, multicast filtering, or a router/NAT between host and device.
 
 Implementation: [pn_turck_demo.cpp](../examples/pn_turck_demo.cpp).
-`Stack::send()` transmits the DCP request and a FrameID hook consumes replies.
+`Stack::send()` (Linux) or the example Npcap adapter (Windows) transmits the
+DCP request and a FrameID hook consumes replies.
 The self-test checks identity decoding, transaction filtering, block padding
 and malformed input without sending anything.
 
 ## Read I/O status
 
-With the device's existing numeric IPv4 address reachable from Linux:
+With the device's existing numeric IPv4 address reachable from the host:
 
 ```sh
 build/linux/pn_turck_demo --status 192.168.1.100
@@ -105,6 +132,17 @@ successful, denied, malformed and BAD-quality responses without Turck hardware:
 ```sh
 ctest --test-dir build/linux -R 'turck_' --output-on-failure
 ```
+
+Windows checks, without GoogleTest or physical hardware:
+
+```powershell
+.\build\windows\Release\pn_turck_demo.exe --self-test
+python .\test\integration\turck_status_loopback.py .\build\windows\Release\pn_turck_demo.exe
+```
+
+Windows may show per-executable firewall prompts during UDP fixture checks.
+Do not grant Public-network access for these local tests. Follow corporate
+policy for any Private-network permissions needed on the dedicated bench NIC.
 
 ## Where PROFIsafe data would go
 

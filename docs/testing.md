@@ -24,7 +24,9 @@ test/
 
 All of it is built only when `PROFINET_BUILD_TESTS=ON` (default when this
 repo is the top-level project). With `PROFINET_POSIX=OFF` (preset `portable`)
-only the codec/dispatcher unit tests are built.
+only the codec/dispatcher GoogleTest tests are built. The `windows` preset
+disables GoogleTest by default; run the TURCK self-test and Python loopback
+fixture directly as shown in [the Windows demo guide](turck-demo.md#native-windows).
 
 ## Running
 
