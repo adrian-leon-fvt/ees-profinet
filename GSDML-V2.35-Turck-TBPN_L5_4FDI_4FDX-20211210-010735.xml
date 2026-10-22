@@ -1,0 +1,1379 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- =========================================================================== -->
+<!--   Company:          Hans Turck GmbH & Co. KG                                -->
+<!--   Device:           TBPN-L5-4FDI-4FDX                                       -->
+<!--   Date Time:        2021-12-10 15:41                                        -->
+<!--   Databases:        GW. V1.00.2910 Rev. 8413, DEV. V1.00.2910 Rev. 8408     -->
+<!--   Author:           Michael Horstmann                                       -->
+<!--   Firmware:         TBPN-L5-4FDI-4FDX:       V1.0.2.0                       
+                         TBPN-L5-4FDI-4FDX-unsafe: V1.0.2.0 -->
+<!-- =========================================================================== -->
+<!-- = Copyright (c) 2002-2021 Hans Turck GmbH & Co. KG                        = -->
+<!-- =========================================================================== -->
+<ISO15745Profile xmlns="http://www.profibus.com/GSDML/2003/11/DeviceProfile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.profibus.com/GSDML/2003/11/DeviceProfile ..\XSD\GSDML-DeviceProfile-V2.35.xsd">
+  <ProfileHeader>
+    <ProfileIdentification>PROFINET Device Profile</ProfileIdentification>
+    <ProfileRevision>1.00</ProfileRevision>
+    <ProfileName>Device Profile for PROFINET Devices</ProfileName>
+    <ProfileSource>PROFIBUS Nutzerorganisation e. V. (PNO)</ProfileSource>
+    <ProfileClassID>Device</ProfileClassID>
+    <ISO15745Reference>
+      <ISO15745Part>4</ISO15745Part>
+      <ISO15745Edition>1</ISO15745Edition>
+      <ProfileTechnology>GSDML</ProfileTechnology>
+    </ISO15745Reference>
+  </ProfileHeader>
+  <ProfileBody>
+    <DeviceIdentity VendorID="0x013D" DeviceID="0xB002">
+      <InfoText TextId="gPxtId_62" />
+      <VendorName Value="Turck" />
+    </DeviceIdentity>
+    <DeviceFunction>
+      <Family MainFamily="I/O" ProductFamily="Turck" />
+    </DeviceFunction>
+    <ApplicationProcess>
+      <DeviceAccessPointList>
+        <DeviceAccessPointItem ID="DAP_TBPN_L5_4FDI_4FDX" CheckDeviceID_Allowed="false" ResetToFactoryModes="2 4 8" LLDP_NoD_Supported="true" PhysicalSlots="0..4" ModuleIdentNumber="0xB0020001" MinDeviceInterval="32" ImplementationType="Turck" DNS_CompatibleName="turck-tbpn-l5-4fdi-4fdx" AddressAssignment="DCP;LOCAL" NameOfStationNotTransferable="false" FixedInSlots="0" ObjectUUID_LocalIndex="1" MultipleWriteSupported="true" AdaptsRealIdentification="true" DeviceAccessSupported="false" PNIO_Version="V2.35">
+          <ModuleInfo CategoryRef="gHcCat_dap">
+            <Name TextId="gPngHc_DAP_TBPN_L5_4FDI_4FDX_Name" />
+            <InfoText TextId="gPxtId_4" />
+            <VendorName Value="Turck" />
+            <OrderNumber Value="100001826" />
+            <HardwareRelease Value="HW 1" />
+            <SoftwareRelease Value="SW V 1.7.35" />
+          </ModuleInfo>
+          <CertificationInfo ConformanceClass="B" ApplicationClass="FunctionalSafety" NetloadClass="III" />
+          <SubslotList>
+            <SubslotItem SubslotNumber="32768" TextId="txtX1" />
+            <SubslotItem SubslotNumber="32769" TextId="txtX1P1" />
+            <SubslotItem SubslotNumber="32770" TextId="txtX1P2" />
+          </SubslotList>
+          <IOConfigData MaxInputLength="1024" MaxOutputLength="1024" />
+          <UseableModules>
+            <ModuleItemRef ModuleItemTarget="dPngGmo_479_Module_status" AllowedInSlots="4" />
+            <ModuleItemRef ModuleItemTarget="dPngGmo_480_Safety_status" AllowedInSlots="2" />
+            <ModuleItemRef ModuleItemTarget="dPngGmo_481_Safety_Fieldbus_Bits" AllowedInSlots="3" />
+            <ModuleItemRef ModuleItemTarget="ModRef_TBPN_PROFISAFE" AllowedInSlots="1" FixedInSlots="1" />
+          </UseableModules>
+          <VirtualSubmoduleList>
+            <VirtualSubmoduleItem ID="SUB_TBPN_L5_4FDI_4FDX" SubmoduleIdentNumber="0x00001000" Writeable_IM_Records="1 2 3 4" MayIssueProcessAlarm="true">
+              <IOData />
+              <RecordDataList>
+                <ParameterRecordDataItem Index="1" Length="2" TransferSequence="1">
+                  <Name TextId="gTId_510" />
+                  <Const Data="0x00,0x00" ByteOffset="0" />
+                  <Ref ValueItemTarget="gPrmSub_NO_YES" DataType="Bit" ByteOffset="1" BitOffset="1" DefaultValue="0" AllowedValues="0..1" TextId="gTId_393_47" />
+                  <Ref ValueItemTarget="gPrmSub_NO_YES" DataType="Bit" ByteOffset="1" BitOffset="4" DefaultValue="0" AllowedValues="0..1" TextId="gTId_397_47" />
+                </ParameterRecordDataItem>
+                <ParameterRecordDataItem Index="28672" Length="2" TransferSequence="2">
+                  <Name TextId="gTId_276" />
+                  <Const Data="0x00,0x00" ByteOffset="0" />
+                  <Ref ValueItemTarget="gPrmSub_NO_YES" DataType="Bit" ByteOffset="1" BitOffset="7" DefaultValue="0" AllowedValues="0..1" TextId="gTId_461_47" />
+                </ParameterRecordDataItem>
+              </RecordDataList>
+              <ModuleInfo CategoryRef="gHcCat_dap_submod">
+                <Name TextId="gPxtId_11" />
+                <InfoText TextId="gPxtId_534" />
+              </ModuleInfo>
+            </VirtualSubmoduleItem>
+          </VirtualSubmoduleList>
+          <SystemDefinedSubmoduleList>
+            <InterfaceSubmoduleItem SubslotNumber="32768" TextId="gPxtId_35" ID="PN_IO_TBPN_L5_4FDI_4FDX" SubmoduleIdentNumber="0x00001001" SupportedRT_Classes="RT_CLASS_1" NetworkComponentDiagnosisSupported="true" SupportedProtocols="SNMP;LLDP" DCP_HelloSupported="false" PTP_BoundarySupported="true" DCP_BoundarySupported="true" PDEV_CombinedObjectSupported="true">
+              <ApplicationRelations StartupMode="Advanced;Legacy" NumberOfAR="1">
+                <TimingProperties SendClock="32 64 128" ReductionRatio="1 2 4 8 16 32 64 128 256 512" />
+              </ApplicationRelations>
+              <MediaRedundancy SupportedRole="Off;Client" />
+            </InterfaceSubmoduleItem>
+            <PortSubmoduleItem SubslotNumber="32769" TextId="gPxtId_36" ID="Port1_TBPN_L5_4FDI_4FDX" SubmoduleIdentNumber="0x00001002" MAUTypes="16" SupportsRingportConfig="true" IsDefaultRingport="true" LinkStateDiagnosisCapability="Up+Down">
+              <MAUTypeList>
+                <MAUTypeItem Value="16" AdjustSupported="true" />
+              </MAUTypeList>
+            </PortSubmoduleItem>
+            <PortSubmoduleItem SubslotNumber="32770" TextId="gPxtId_37" ID="Port2_TBPN_L5_4FDI_4FDX" SubmoduleIdentNumber="0x00001002" MAUTypes="16" SupportsRingportConfig="true" IsDefaultRingport="true" LinkStateDiagnosisCapability="Up+Down">
+              <MAUTypeList>
+                <MAUTypeItem Value="16" AdjustSupported="true" />
+              </MAUTypeList>
+            </PortSubmoduleItem>
+          </SystemDefinedSubmoduleList>
+          <Graphics>
+            <GraphicItemRef Type="DeviceSymbol" GraphicItemTarget="GraRef_TBPN_L5_4FDI_4FDX" />
+          </Graphics>
+          <SlotList>
+            <SlotItem SlotNumber="1" TextId="gTId_559" />
+            <SlotItem SlotNumber="2" TextId="gTId_560" />
+            <SlotItem SlotNumber="3" TextId="gTId_654" />
+            <SlotItem SlotNumber="4" TextId="gTId_552" />
+          </SlotList>
+        </DeviceAccessPointItem>
+        <DeviceAccessPointItem ID="DAP_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC" CheckDeviceID_Allowed="false" ResetToFactoryModes="2 4 8" LLDP_NoD_Supported="true" PhysicalSlots="0..4" ModuleIdentNumber="0xB0020002" MinDeviceInterval="32" ImplementationType="Turck" DNS_CompatibleName="turck-tbpn-l5-4fdi-4fdx-use-for-non-safe-plc" AddressAssignment="DCP;LOCAL" NameOfStationNotTransferable="false" FixedInSlots="0" ObjectUUID_LocalIndex="1" MultipleWriteSupported="true" AdaptsRealIdentification="true" DeviceAccessSupported="false" PNIO_Version="V2.35">
+          <ModuleInfo CategoryRef="gHcCat_dap">
+            <Name TextId="gPngHc_DAP_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC_Name" />
+            <InfoText TextId="gPxtId_4" />
+            <VendorName Value="Turck" />
+            <OrderNumber Value="100001826" />
+            <HardwareRelease Value="HW 1" />
+            <SoftwareRelease Value="SW V 1.7.35" />
+          </ModuleInfo>
+          <CertificationInfo ConformanceClass="B" ApplicationClass="" NetloadClass="III" />
+          <SubslotList>
+            <SubslotItem SubslotNumber="32768" TextId="txtX1" />
+            <SubslotItem SubslotNumber="32769" TextId="txtX1P1" />
+            <SubslotItem SubslotNumber="32770" TextId="txtX1P2" />
+          </SubslotList>
+          <IOConfigData MaxInputLength="1024" MaxOutputLength="1024" />
+          <UseableModules>
+            <ModuleItemRef ModuleItemTarget="dPngGmo_479_Module_status" AllowedInSlots="4" />
+            <ModuleItemRef ModuleItemTarget="dPngGmo_480_Safety_status" AllowedInSlots="2" />
+            <ModuleItemRef ModuleItemTarget="dPngGmo_481_Safety_Fieldbus_Bits" AllowedInSlots="3" />
+          </UseableModules>
+          <VirtualSubmoduleList>
+            <VirtualSubmoduleItem ID="SUB_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC" SubmoduleIdentNumber="0x00001000" Writeable_IM_Records="1 2 3 4" MayIssueProcessAlarm="true">
+              <IOData />
+              <RecordDataList>
+                <ParameterRecordDataItem Index="1" Length="2" TransferSequence="1">
+                  <Name TextId="gTId_510" />
+                  <Const Data="0x00,0x00" ByteOffset="0" />
+                  <Ref ValueItemTarget="gPrmSub_NO_YES" DataType="Bit" ByteOffset="1" BitOffset="1" DefaultValue="0" AllowedValues="0..1" TextId="gTId_393_47" />
+                  <Ref ValueItemTarget="gPrmSub_NO_YES" DataType="Bit" ByteOffset="1" BitOffset="4" DefaultValue="0" AllowedValues="0..1" TextId="gTId_397_47" />
+                </ParameterRecordDataItem>
+                <ParameterRecordDataItem Index="28672" Length="2" TransferSequence="2">
+                  <Name TextId="gTId_276" />
+                  <Const Data="0x00,0x00" ByteOffset="0" />
+                  <Ref ValueItemTarget="gPrmSub_NO_YES" DataType="Bit" ByteOffset="1" BitOffset="7" DefaultValue="0" AllowedValues="0..1" TextId="gTId_461_47" />
+                </ParameterRecordDataItem>
+              </RecordDataList>
+              <ModuleInfo CategoryRef="gHcCat_dap_submod">
+                <Name TextId="gPxtId_11" />
+                <InfoText TextId="gPxtId_534" />
+              </ModuleInfo>
+            </VirtualSubmoduleItem>
+          </VirtualSubmoduleList>
+          <SystemDefinedSubmoduleList>
+            <InterfaceSubmoduleItem SubslotNumber="32768" TextId="gPxtId_35" ID="PN_IO_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC" SubmoduleIdentNumber="0x00001001" SupportedRT_Classes="RT_CLASS_1" NetworkComponentDiagnosisSupported="true" SupportedProtocols="SNMP;LLDP" DCP_HelloSupported="false" PTP_BoundarySupported="true" DCP_BoundarySupported="true" PDEV_CombinedObjectSupported="true">
+              <ApplicationRelations StartupMode="Advanced;Legacy" NumberOfAR="1">
+                <TimingProperties SendClock="32 64 128" ReductionRatio="1 2 4 8 16 32 64 128 256 512" />
+              </ApplicationRelations>
+              <MediaRedundancy SupportedRole="Off;Client" />
+            </InterfaceSubmoduleItem>
+            <PortSubmoduleItem SubslotNumber="32769" TextId="gPxtId_36" ID="Port1_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC" SubmoduleIdentNumber="0x00001002" MAUTypes="16" SupportsRingportConfig="true" IsDefaultRingport="true" LinkStateDiagnosisCapability="Up+Down">
+              <MAUTypeList>
+                <MAUTypeItem Value="16" AdjustSupported="true" />
+              </MAUTypeList>
+            </PortSubmoduleItem>
+            <PortSubmoduleItem SubslotNumber="32770" TextId="gPxtId_37" ID="Port2_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC" SubmoduleIdentNumber="0x00001002" MAUTypes="16" SupportsRingportConfig="true" IsDefaultRingport="true" LinkStateDiagnosisCapability="Up+Down">
+              <MAUTypeList>
+                <MAUTypeItem Value="16" AdjustSupported="true" />
+              </MAUTypeList>
+            </PortSubmoduleItem>
+          </SystemDefinedSubmoduleList>
+          <Graphics>
+            <GraphicItemRef Type="DeviceSymbol" GraphicItemTarget="GraRef_TBPN_L5_4FDI_4FDX" />
+          </Graphics>
+          <SlotList>
+            <SlotItem SlotNumber="1" TextId="gTId_559" />
+            <SlotItem SlotNumber="2" TextId="gTId_560" />
+            <SlotItem SlotNumber="3" TextId="gTId_654" />
+            <SlotItem SlotNumber="4" TextId="gTId_552" />
+          </SlotList>
+        </DeviceAccessPointItem>
+      </DeviceAccessPointList>
+      <ModuleList>
+        <ModuleItem ID="ModRef_TBPN_PROFISAFE" ModuleIdentNumber="0x00186002">
+          <ModuleInfo>
+            <Name TextId="IDTM_PS12" />
+            <InfoText TextId="IDTI_PS12" />
+            <HardwareRelease Value="1.0" />
+            <SoftwareRelease Value="1.0" />
+          </ModuleInfo>
+          <VirtualSubmoduleList>
+            <VirtualSubmoduleItem ID="IDS_F_12_0" SubmoduleIdentNumber="0x00186002" API="0" PROFIsafeSupported="true" MayIssueProcessAlarm="true">
+              <IOData F_IO_StructureDescCRC="5639">
+                <Input Consistency="All items consistency">
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="IDT_PS_FIN" />
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="IDT_PS_FIN" />
+                  <DataItem DataType="F_MessageTrailer4Byte" TextId="IDT_PS_TRAILER" />
+                </Input>
+                <Output Consistency="All items consistency">
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="IDT_PS_FOUT" />
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="IDT_PS_FOUT" />
+                  <DataItem DataType="F_MessageTrailer4Byte" TextId="IDT_PS_TRAILER" />
+                </Output>
+              </IOData>
+              <RecordDataList>
+                <F_ParameterRecordDataItem Index="512" F_ParamDescCRC="55394">
+                  <F_Check_iPar DefaultValue="NoCheck" Visible="false" Changeable="false" />
+                  <F_SIL DefaultValue="SIL3" AllowedValues="SIL1 SIL2 SIL3 NoSIL" Visible="true" Changeable="true" />
+                  <F_CRC_Length DefaultValue="3-Byte-CRC" AllowedValues="3-Byte-CRC" Visible="true" Changeable="false" />
+                  <F_Block_ID DefaultValue="1" AllowedValues="0..7" Visible="true" Changeable="false" />
+                  <F_Par_Version />
+                  <F_Source_Add AllowedValues="1..65534" />
+                  <F_Dest_Add AllowedValues="1..65534" />
+                  <F_WD_Time DefaultValue="150" AllowedValues="80..65535" />
+                  <F_Par_CRC DefaultValue="31615" />
+                  <F_iPar_CRC DefaultValue="0" />
+                </F_ParameterRecordDataItem>
+              </RecordDataList>
+              <ModuleInfo>
+                <Name TextId="IDTM_PS12" />
+                <InfoText TextId="IDTI_PS12" />
+              </ModuleInfo>
+            </VirtualSubmoduleItem>
+          </VirtualSubmoduleList>
+        </ModuleItem>
+        <ModuleItem ID="dPngGmo_479_Module_status" ModuleIdentNumber="0x00080000">
+          <ModuleInfo>
+            <Name TextId="dPngGmo_479_Module_status" />
+            <InfoText TextId="dPngGmo_479_Module_status" />
+          </ModuleInfo>
+          <VirtualSubmoduleList>
+            <VirtualSubmoduleItem ID="479_Module_status-VirtSubMod1" SubmoduleIdentNumber="0x00080000" FixedInSubslots="1" MayIssueProcessAlarm="true">
+              <IOData>
+                <Input>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_698783">
+                    <BitDataItem BitOffset="6" TextId="dTId_698792_94141" />
+                    <BitDataItem BitOffset="1" TextId="dTId_698796_94141" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699139_94141" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_698783">
+                    <BitDataItem BitOffset="0" TextId="dTId_698795_94141" />
+                  </DataItem>
+                </Input>
+              </IOData>
+              <ModuleInfo>
+                <Name TextId="dPngGmo_479_Module_status" />
+                <InfoText TextId="dPngGmo_479_Module_status" />
+              </ModuleInfo>
+            </VirtualSubmoduleItem>
+          </VirtualSubmoduleList>
+        </ModuleItem>
+        <ModuleItem ID="dPngGmo_480_Safety_status" ModuleIdentNumber="0x012C2009">
+          <ModuleInfo>
+            <Name TextId="dPngGmo_480_Safety_status" />
+            <InfoText TextId="dPngGmo_480_Safety_status" />
+          </ModuleInfo>
+          <VirtualSubmoduleList>
+            <VirtualSubmoduleItem ID="480_Safety_status-VirtSubMod1" SubmoduleIdentNumber="0x012C2009" FixedInSubslots="1" MayIssueProcessAlarm="true">
+              <IOData>
+                <Input>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699188">
+                    <BitDataItem BitOffset="0" TextId="dTId_699246_94150" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699247_94150" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699248_94150" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" TextId="dTId_138380" />
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699189">
+                    <BitDataItem BitOffset="0" TextId="dTId_699199_94150" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699200_94150" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699201_94150" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699202_94150" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699203_94150" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699204_94150" />
+                    <BitDataItem BitOffset="6" TextId="dTId_699205_94150" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699206_94150" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699189">
+                    <BitDataItem BitOffset="0" TextId="dTId_699207_94150" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699208_94150" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699190">
+                    <BitDataItem BitOffset="0" TextId="dTId_699214_94150" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699213_94150" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699212_94150" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699210_94150" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699209_94150" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" TextId="dTId_138380" />
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699259">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch0" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch0" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch0" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch0" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch0" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch0" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch0" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699180">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch1" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch1" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch1" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch1" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch1" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch1" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch1" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699181">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch2" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch2" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch2" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch2" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch2" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch2" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch2" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699182">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch3" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch3" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch3" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch3" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch3" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch3" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch3" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699183">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch4" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch4" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch4" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch4" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch4" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch4" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch4" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699184">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch5" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch5" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch5" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch5" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch5" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch5" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch5" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699185">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch6" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch6" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch6" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch6" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch6" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch6" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch6" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699186">
+                    <BitDataItem BitOffset="0" TextId="dTId_699192_94150Ch7" />
+                    <BitDataItem BitOffset="1" TextId="dTId_699193_94150Ch7" />
+                    <BitDataItem BitOffset="2" TextId="dTId_699194_94150Ch7" />
+                    <BitDataItem BitOffset="3" TextId="dTId_699195_94150Ch7" />
+                    <BitDataItem BitOffset="4" TextId="dTId_699196_94150Ch7" />
+                    <BitDataItem BitOffset="5" TextId="dTId_699197_94150Ch7" />
+                    <BitDataItem BitOffset="7" TextId="dTId_699198_94150Ch7" />
+                  </DataItem>
+                </Input>
+                <Output>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dTId_699245">
+                    <BitDataItem BitOffset="0" TextId="dTId_699226_94150" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" TextId="dTId_138380" />
+                </Output>
+              </IOData>
+              <ModuleInfo>
+                <Name TextId="dPngGmo_480_Safety_status" />
+                <InfoText TextId="dPngGmo_480_Safety_status" />
+              </ModuleInfo>
+            </VirtualSubmoduleItem>
+          </VirtualSubmoduleList>
+        </ModuleItem>
+        <ModuleItem ID="dPngGmo_481_Safety_Fieldbus_Bits" ModuleIdentNumber="0x04082000">
+          <ModuleInfo>
+            <Name TextId="dPngGmo_481_Safety_Fieldbus_Bits" />
+            <InfoText TextId="dPngGmo_481_Safety_Fieldbus_Bits" />
+          </ModuleInfo>
+          <VirtualSubmoduleList>
+            <VirtualSubmoduleItem ID="481_Safety_Fieldbus_Bits-VirtSubMod1" SubmoduleIdentNumber="0x04082000" FixedInSubslots="1" MayIssueProcessAlarm="true">
+              <IOData>
+                <Input>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dPngGmo_481_Safety_Fieldbus_Bits">
+                    <BitDataItem BitOffset="0" TextId="dTId_700318_94218" />
+                    <BitDataItem BitOffset="1" TextId="dTId_700548_94218" />
+                    <BitDataItem BitOffset="2" TextId="dTId_700550_94218" />
+                    <BitDataItem BitOffset="3" TextId="dTId_700552_94218" />
+                    <BitDataItem BitOffset="4" TextId="dTId_700554_94218" />
+                    <BitDataItem BitOffset="5" TextId="dTId_700556_94218" />
+                    <BitDataItem BitOffset="6" TextId="dTId_700558_94218" />
+                    <BitDataItem BitOffset="7" TextId="dTId_700560_94218" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dPngGmo_481_Safety_Fieldbus_Bits">
+                    <BitDataItem BitOffset="0" TextId="dTId_700562_94218" />
+                    <BitDataItem BitOffset="1" TextId="dTId_700564_94218" />
+                    <BitDataItem BitOffset="2" TextId="dTId_700576_94218" />
+                    <BitDataItem BitOffset="3" TextId="dTId_700566_94218" />
+                    <BitDataItem BitOffset="4" TextId="dTId_700568_94218" />
+                    <BitDataItem BitOffset="5" TextId="dTId_700570_94218" />
+                    <BitDataItem BitOffset="6" TextId="dTId_700572_94218" />
+                    <BitDataItem BitOffset="7" TextId="dTId_700574_94218" />
+                  </DataItem>
+                </Input>
+                <Output>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dPngGmo_481_Safety_Fieldbus_Bits">
+                    <BitDataItem BitOffset="0" TextId="dTId_700319_94218" />
+                    <BitDataItem BitOffset="1" TextId="dTId_700549_94218" />
+                    <BitDataItem BitOffset="2" TextId="dTId_700551_94218" />
+                    <BitDataItem BitOffset="3" TextId="dTId_700553_94218" />
+                    <BitDataItem BitOffset="4" TextId="dTId_700555_94218" />
+                    <BitDataItem BitOffset="5" TextId="dTId_700557_94218" />
+                    <BitDataItem BitOffset="6" TextId="dTId_700559_94218" />
+                    <BitDataItem BitOffset="7" TextId="dTId_700561_94218" />
+                  </DataItem>
+                  <DataItem DataType="Unsigned8" UseAsBits="true" TextId="dPngGmo_481_Safety_Fieldbus_Bits">
+                    <BitDataItem BitOffset="0" TextId="dTId_700563_94218" />
+                    <BitDataItem BitOffset="1" TextId="dTId_700565_94218" />
+                    <BitDataItem BitOffset="2" TextId="dTId_700577_94218" />
+                    <BitDataItem BitOffset="3" TextId="dTId_700567_94218" />
+                    <BitDataItem BitOffset="4" TextId="dTId_700569_94218" />
+                    <BitDataItem BitOffset="5" TextId="dTId_700571_94218" />
+                    <BitDataItem BitOffset="6" TextId="dTId_700573_94218" />
+                    <BitDataItem BitOffset="7" TextId="dTId_700575_94218" />
+                  </DataItem>
+                </Output>
+              </IOData>
+              <ModuleInfo>
+                <Name TextId="dPngGmo_481_Safety_Fieldbus_Bits" />
+                <InfoText TextId="dPngGmo_481_Safety_Fieldbus_Bits" />
+              </ModuleInfo>
+            </VirtualSubmoduleItem>
+          </VirtualSubmoduleList>
+        </ModuleItem>
+      </ModuleList>
+      <ValueList>
+        <ValueItem ID="PrmSlotParam">
+          <Assignments>
+            <Assign Content="0" TextId="txtAktivieren" />
+            <Assign Content="1" TextId="txtDeaktivieren" />
+          </Assignments>
+        </ValueItem>
+        <ValueItem ID="gPrmSub_NO_YES">
+          <Assignments>
+            <Assign Content="0" TextId="gTId_463" />
+            <Assign Content="1" TextId="gTId_462" />
+          </Assignments>
+        </ValueItem>
+      </ValueList>
+      <ChannelDiagList>
+        <ChannelDiagItem ErrorType="16">
+          <Name TextId="gPxtId_15" />
+          <Help TextId="gPxtId_16" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="21">
+          <Name TextId="gPxtId_21" />
+          <Help TextId="gPxtId_22" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="22">
+          <Name TextId="gPxtId_23" />
+          <Help TextId="gPxtId_24" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="23">
+          <Name TextId="gPxtId_25" />
+          <Help TextId="gPxtId_26" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="24">
+          <Name TextId="gPxtId_27" />
+          <Help TextId="gPxtId_28" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="26">
+          <Name TextId="gPxtId_29" />
+          <Help TextId="gPxtId_30" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="28">
+          <Name TextId="gPxtId_31" />
+          <Help TextId="gPxtId_32" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="29">
+          <Name TextId="gPxtId_33" />
+          <Help TextId="gPxtId_34" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="64">
+          <Name TextId="gPxtId_63" />
+          <Help TextId="gPxtId_73" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="65">
+          <Name TextId="gPxtId_64" />
+          <Help TextId="gPxtId_74" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="66">
+          <Name TextId="gPxtId_65" />
+          <Help TextId="gPxtId_75" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="67">
+          <Name TextId="gPxtId_66" />
+          <Help TextId="gPxtId_76" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="68">
+          <Name TextId="gPxtId_67" />
+          <Help TextId="gPxtId_77" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="69">
+          <Name TextId="gPxtId_68" />
+          <Help TextId="gPxtId_78" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="70">
+          <Name TextId="gPxtId_69" />
+          <Help TextId="gPxtId_79" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="71">
+          <Name TextId="gPxtId_70" />
+          <Help TextId="gPxtId_80" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="72">
+          <Name TextId="gPxtId_71" />
+          <Help TextId="gPxtId_81" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="75">
+          <Name TextId="gPxtId_72" />
+          <Help TextId="gPxtId_82" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="342">
+          <Name TextId="gPxtId_210" />
+          <Help TextId="gPxtId_213" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="372">
+          <Name TextId="gPxtId_241" />
+          <Help TextId="gPxtId_242" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="373">
+          <Name TextId="gPxtId_243" />
+          <Help TextId="gPxtId_244" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="512">
+          <Name TextId="gPxtId_88" />
+          <Help TextId="gPxtId_93" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="513">
+          <Name TextId="gPxtId_87" />
+          <Help TextId="gPxtId_92" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="514">
+          <Name TextId="gPxtId_86" />
+          <Help TextId="gPxtId_91" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="516">
+          <Name TextId="gPxtId_84" />
+          <Help TextId="gPxtId_89" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="519">
+          <Name TextId="gPxtId_83" />
+          <Help TextId="gPxtId_206" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="528">
+          <Name TextId="gPxtId_95" />
+          <Help TextId="gPxtId_144" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="529">
+          <Name TextId="gPxtId_102" />
+          <Help TextId="gPxtId_151" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="530">
+          <Name TextId="gPxtId_109" />
+          <Help TextId="gPxtId_158" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="531">
+          <Name TextId="gPxtId_116" />
+          <Help TextId="gPxtId_165" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="532">
+          <Name TextId="gPxtId_123" />
+          <Help TextId="gPxtId_172" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="533">
+          <Name TextId="gPxtId_130" />
+          <Help TextId="gPxtId_179" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="534">
+          <Name TextId="gPxtId_193" />
+          <Help TextId="gPxtId_200" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="535">
+          <Name TextId="gPxtId_137" />
+          <Help TextId="gPxtId_186" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="544">
+          <Name TextId="gPxtId_96" />
+          <Help TextId="gPxtId_145" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="545">
+          <Name TextId="gPxtId_103" />
+          <Help TextId="gPxtId_152" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="546">
+          <Name TextId="gPxtId_110" />
+          <Help TextId="gPxtId_159" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="547">
+          <Name TextId="gPxtId_117" />
+          <Help TextId="gPxtId_166" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="548">
+          <Name TextId="gPxtId_124" />
+          <Help TextId="gPxtId_173" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="549">
+          <Name TextId="gPxtId_131" />
+          <Help TextId="gPxtId_180" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="550">
+          <Name TextId="gPxtId_194" />
+          <Help TextId="gPxtId_201" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="551">
+          <Name TextId="gPxtId_138" />
+          <Help TextId="gPxtId_187" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="560">
+          <Name TextId="gPxtId_97" />
+          <Help TextId="gPxtId_146" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="561">
+          <Name TextId="gPxtId_104" />
+          <Help TextId="gPxtId_153" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="562">
+          <Name TextId="gPxtId_111" />
+          <Help TextId="gPxtId_160" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="563">
+          <Name TextId="gPxtId_118" />
+          <Help TextId="gPxtId_167" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="564">
+          <Name TextId="gPxtId_125" />
+          <Help TextId="gPxtId_174" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="565">
+          <Name TextId="gPxtId_132" />
+          <Help TextId="gPxtId_181" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="566">
+          <Name TextId="gPxtId_195" />
+          <Help TextId="gPxtId_202" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="567">
+          <Name TextId="gPxtId_139" />
+          <Help TextId="gPxtId_188" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="576">
+          <Name TextId="gPxtId_98" />
+          <Help TextId="gPxtId_147" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="577">
+          <Name TextId="gPxtId_105" />
+          <Help TextId="gPxtId_154" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="578">
+          <Name TextId="gPxtId_112" />
+          <Help TextId="gPxtId_161" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="579">
+          <Name TextId="gPxtId_119" />
+          <Help TextId="gPxtId_168" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="580">
+          <Name TextId="gPxtId_126" />
+          <Help TextId="gPxtId_175" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="581">
+          <Name TextId="gPxtId_133" />
+          <Help TextId="gPxtId_182" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="582">
+          <Name TextId="gPxtId_196" />
+          <Help TextId="gPxtId_203" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="583">
+          <Name TextId="gPxtId_140" />
+          <Help TextId="gPxtId_189" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="592">
+          <Name TextId="gPxtId_99" />
+          <Help TextId="gPxtId_148" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="593">
+          <Name TextId="gPxtId_106" />
+          <Help TextId="gPxtId_155" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="594">
+          <Name TextId="gPxtId_113" />
+          <Help TextId="gPxtId_162" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="595">
+          <Name TextId="gPxtId_120" />
+          <Help TextId="gPxtId_169" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="596">
+          <Name TextId="gPxtId_127" />
+          <Help TextId="gPxtId_176" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="597">
+          <Name TextId="gPxtId_134" />
+          <Help TextId="gPxtId_183" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="598">
+          <Name TextId="gPxtId_197" />
+          <Help TextId="gPxtId_204" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="599">
+          <Name TextId="gPxtId_141" />
+          <Help TextId="gPxtId_190" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="624">
+          <Name TextId="gPxtId_100" />
+          <Help TextId="gPxtId_149" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="625">
+          <Name TextId="gPxtId_107" />
+          <Help TextId="gPxtId_156" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="626">
+          <Name TextId="gPxtId_114" />
+          <Help TextId="gPxtId_163" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="627">
+          <Name TextId="gPxtId_121" />
+          <Help TextId="gPxtId_170" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="628">
+          <Name TextId="gPxtId_128" />
+          <Help TextId="gPxtId_177" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="629">
+          <Name TextId="gPxtId_135" />
+          <Help TextId="gPxtId_184" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="630">
+          <Name TextId="gPxtId_198" />
+          <Help TextId="gPxtId_205" />
+        </ChannelDiagItem>
+        <ChannelDiagItem ErrorType="631">
+          <Name TextId="gPxtId_142" />
+          <Help TextId="gPxtId_191" />
+        </ChannelDiagItem>
+      </ChannelDiagList>
+      <GraphicsList>
+        <GraphicItem ID="GraRef_TBPN_L5_4FDI_4FDX" GraphicFile="GSDML-013D-B002-TBPN_L5_4FDI_4FDX" />
+      </GraphicsList>
+      <CategoryList>
+        <CategoryItem ID="gHcCat_dap" TextId="gPngHc_dap" />
+        <CategoryItem ID="gHcCat_dap_submod" TextId="gPxtId_4" />
+      </CategoryList>
+      <ExternalTextList>
+        <PrimaryLanguage>
+          <Text TextId="txtX1" Value="X1" />
+          <Text TextId="txtX1P1" Value="X1 P1" />
+          <Text TextId="txtX1P2" Value="X1 P2" />
+          <Text TextId="txtSlotParam" Value="module parameterization" />
+          <!-- PROFISAFE Additions -->
+          <Text TextId="IDT_PS_FIN" Value="Safe input data" />
+          <Text TextId="IDT_PS_FOUT" Value="Safe output data" />
+          <Text TextId="IDT_PS_TRAILER" Value="PROFIsafe-trailer" />
+          <Text TextId="IDTM_PS12" Value="PROFIsafe-module" />
+          <Text TextId="IDTI_PS12" Value="2 byte safety-related I/O-data (+ 4 byte PROFIsafe-trailer)" />
+          <Text TextId="txtAktivieren" Value="activate" />
+          <Text TextId="txtDeaktivieren" Value="deactivate" />
+          <Text TextId="dPngGmo_479_Module_status" Value="Module status" />
+          <Text TextId="dPngGmo_480_Safety_status" Value="Safety status" />
+          <Text TextId="dPngGmo_481_Safety_Fieldbus_Bits" Value="Safety Fieldbus Bits" />
+          <Text TextId="dTId_138380" Value="Reserved" />
+          <Text TextId="dTId_698783" Value="Module state" />
+          <Text TextId="dTId_698792_94141" Value="I/O-ASSISTANT Force Mode active" />
+          <Text TextId="dTId_698795_94141" Value="Module diagnostics available" />
+          <Text TextId="dTId_698796_94141" Value="Undervoltage V1" />
+          <Text TextId="dTId_699139_94141" Value="Internal error" />
+          <Text TextId="dTId_699180" Value="Safety diagnostics C 1" />
+          <Text TextId="dTId_699181" Value="Safety diagnostics C 2" />
+          <Text TextId="dTId_699182" Value="Safety diagnostics C 3" />
+          <Text TextId="dTId_699183" Value="Safety diagnostics C 4" />
+          <Text TextId="dTId_699184" Value="Safety diagnostics C 5" />
+          <Text TextId="dTId_699185" Value="Safety diagnostics C 6" />
+          <Text TextId="dTId_699186" Value="Safety diagnostics C 7" />
+          <Text TextId="dTId_699188" Value="Safety unit status" />
+          <Text TextId="dTId_699189" Value="Safety error codes" />
+          <Text TextId="dTId_699190" Value="Safety configuration integrity" />
+          <Text TextId="dTId_699192_94150Ch0" Value="Normal state C0" />
+          <Text TextId="dTId_699192_94150Ch1" Value="Normal state C1" />
+          <Text TextId="dTId_699192_94150Ch2" Value="Normal state C2" />
+          <Text TextId="dTId_699192_94150Ch3" Value="Normal state C3" />
+          <Text TextId="dTId_699192_94150Ch4" Value="Normal state C4" />
+          <Text TextId="dTId_699192_94150Ch5" Value="Normal state C5" />
+          <Text TextId="dTId_699192_94150Ch6" Value="Normal state C6" />
+          <Text TextId="dTId_699192_94150Ch7" Value="Normal state C7" />
+          <Text TextId="dTId_699193_94150Ch0" Value="Wait for input signal C0" />
+          <Text TextId="dTId_699193_94150Ch1" Value="Wait for input signal C1" />
+          <Text TextId="dTId_699193_94150Ch2" Value="Wait for input signal C2" />
+          <Text TextId="dTId_699193_94150Ch3" Value="Wait for input signal C3" />
+          <Text TextId="dTId_699193_94150Ch4" Value="Wait for input signal C4" />
+          <Text TextId="dTId_699193_94150Ch5" Value="Wait for input signal C5" />
+          <Text TextId="dTId_699193_94150Ch6" Value="Wait for input signal C6" />
+          <Text TextId="dTId_699193_94150Ch7" Value="Wait for input signal C7" />
+          <Text TextId="dTId_699194_94150Ch0" Value="Test input C0" />
+          <Text TextId="dTId_699194_94150Ch1" Value="Test input C1" />
+          <Text TextId="dTId_699194_94150Ch2" Value="Test input C2" />
+          <Text TextId="dTId_699194_94150Ch3" Value="Test input C3" />
+          <Text TextId="dTId_699194_94150Ch4" Value="Test input C4" />
+          <Text TextId="dTId_699194_94150Ch5" Value="Test input C5" />
+          <Text TextId="dTId_699194_94150Ch6" Value="Test input C6" />
+          <Text TextId="dTId_699194_94150Ch7" Value="Test input C7" />
+          <Text TextId="dTId_699195_94150Ch0" Value="Input error C0" />
+          <Text TextId="dTId_699195_94150Ch1" Value="Input error C1" />
+          <Text TextId="dTId_699195_94150Ch2" Value="Input error C2" />
+          <Text TextId="dTId_699195_94150Ch3" Value="Input error C3" />
+          <Text TextId="dTId_699195_94150Ch4" Value="Input error C4" />
+          <Text TextId="dTId_699195_94150Ch5" Value="Input error C5" />
+          <Text TextId="dTId_699195_94150Ch6" Value="Input error C6" />
+          <Text TextId="dTId_699195_94150Ch7" Value="Input error C7" />
+          <Text TextId="dTId_699196_94150Ch0" Value="Cross-circuit channel 0 C0" />
+          <Text TextId="dTId_699196_94150Ch1" Value="Cross-circuit channel 0 C1" />
+          <Text TextId="dTId_699196_94150Ch2" Value="Cross-circuit channel 0 C2" />
+          <Text TextId="dTId_699196_94150Ch3" Value="Cross-circuit channel 0 C3" />
+          <Text TextId="dTId_699196_94150Ch4" Value="Cross-circuit channel 0 C4" />
+          <Text TextId="dTId_699196_94150Ch5" Value="Cross-circuit channel 0 C5" />
+          <Text TextId="dTId_699196_94150Ch6" Value="Cross-circuit channel 0 C6" />
+          <Text TextId="dTId_699196_94150Ch7" Value="Cross-circuit channel 0 C7" />
+          <Text TextId="dTId_699197_94150Ch0" Value="Cross-circuit channel 1 C0" />
+          <Text TextId="dTId_699197_94150Ch1" Value="Cross-circuit channel 1 C1" />
+          <Text TextId="dTId_699197_94150Ch2" Value="Cross-circuit channel 1 C2" />
+          <Text TextId="dTId_699197_94150Ch3" Value="Cross-circuit channel 1 C3" />
+          <Text TextId="dTId_699197_94150Ch4" Value="Cross-circuit channel 1 C4" />
+          <Text TextId="dTId_699197_94150Ch5" Value="Cross-circuit channel 1 C5" />
+          <Text TextId="dTId_699197_94150Ch6" Value="Cross-circuit channel 1 C6" />
+          <Text TextId="dTId_699197_94150Ch7" Value="Cross-circuit channel 1 C7" />
+          <Text TextId="dTId_699198_94150Ch0" Value="Output overload C0" />
+          <Text TextId="dTId_699198_94150Ch1" Value="Output overload C1" />
+          <Text TextId="dTId_699198_94150Ch2" Value="Output overload C2" />
+          <Text TextId="dTId_699198_94150Ch3" Value="Output overload C3" />
+          <Text TextId="dTId_699198_94150Ch4" Value="Output overload C4" />
+          <Text TextId="dTId_699198_94150Ch5" Value="Output overload C5" />
+          <Text TextId="dTId_699198_94150Ch6" Value="Output overload C6" />
+          <Text TextId="dTId_699198_94150Ch7" Value="Output overload C7" />
+          <Text TextId="dTId_699199_94150" Value="Destination address mismatch" />
+          <Text TextId="dTId_699200_94150" Value="Invalid destination address" />
+          <Text TextId="dTId_699201_94150" Value="Invalid source address" />
+          <Text TextId="dTId_699202_94150" Value="Invalid watchdog time value" />
+          <Text TextId="dTId_699203_94150" Value="SIL value exceeded" />
+          <Text TextId="dTId_699204_94150" Value="Invalid length of CRC2" />
+          <Text TextId="dTId_699205_94150" Value="Invalid PROFIsafe version" />
+          <Text TextId="dTId_699206_94150" Value="CRC1 mismatch" />
+          <Text TextId="dTId_699207_94150" Value="Invalid PROFIsafe parameters" />
+          <Text TextId="dTId_699208_94150" Value="iParameter CRC mismatch" />
+          <Text TextId="dTId_699209_94150" Value="Fatal error" />
+          <Text TextId="dTId_699210_94150" Value="Communication loss" />
+          <Text TextId="dTId_699212_94150" Value="Configuration mismatch" />
+          <Text TextId="dTId_699213_94150" Value="No configuration available" />
+          <Text TextId="dTId_699214_94150" Value="No memory stick plugged" />
+          <Text TextId="dTId_699226_94150" Value="Unlock safety unit" />
+          <Text TextId="dTId_699245" Value="Safety unit control" />
+          <Text TextId="dTId_699246_94150" Value="Protective mode" />
+          <Text TextId="dTId_699247_94150" Value="Configuration mode" />
+          <Text TextId="dTId_699248_94150" Value="Unkown mode" />
+          <Text TextId="dTId_699259" Value="Safety diagnostics C 0" />
+          <Text TextId="dTId_700318_94218" Value="Fieldbus bit input 0" />
+          <Text TextId="dTId_700319_94218" Value="Fieldbus bit output 0" />
+          <Text TextId="dTId_700548_94218" Value="Fieldbus bit input 1" />
+          <Text TextId="dTId_700549_94218" Value="Fieldbus bit output 1" />
+          <Text TextId="dTId_700550_94218" Value="Fieldbus bit input 2" />
+          <Text TextId="dTId_700551_94218" Value="Fieldbus bit output 2" />
+          <Text TextId="dTId_700552_94218" Value="Fieldbus bit input 3" />
+          <Text TextId="dTId_700553_94218" Value="Fieldbus bit output 3" />
+          <Text TextId="dTId_700554_94218" Value="Fieldbus bit input 4" />
+          <Text TextId="dTId_700555_94218" Value="Fieldbus bit output 4" />
+          <Text TextId="dTId_700556_94218" Value="Fieldbus bit input 5" />
+          <Text TextId="dTId_700557_94218" Value="Fieldbus bit output 5" />
+          <Text TextId="dTId_700558_94218" Value="Fieldbus bit input 6" />
+          <Text TextId="dTId_700559_94218" Value="Fieldbus bit output 6" />
+          <Text TextId="dTId_700560_94218" Value="Fieldbus bit input 7" />
+          <Text TextId="dTId_700561_94218" Value="Fieldbus bit output 7" />
+          <Text TextId="dTId_700562_94218" Value="Fieldbus bit input 8" />
+          <Text TextId="dTId_700563_94218" Value="Fieldbus bit output 8" />
+          <Text TextId="dTId_700564_94218" Value="Fieldbus bit input 9" />
+          <Text TextId="dTId_700565_94218" Value="Fieldbus bit output 9" />
+          <Text TextId="dTId_700566_94218" Value="Fieldbus bit input 11" />
+          <Text TextId="dTId_700567_94218" Value="Fieldbus bit output 11" />
+          <Text TextId="dTId_700568_94218" Value="Fieldbus bit input 12" />
+          <Text TextId="dTId_700569_94218" Value="Fieldbus bit output 12" />
+          <Text TextId="dTId_700570_94218" Value="Fieldbus bit input 13" />
+          <Text TextId="dTId_700571_94218" Value="Fieldbus bit output 13" />
+          <Text TextId="dTId_700572_94218" Value="Fieldbus bit input 14" />
+          <Text TextId="dTId_700573_94218" Value="Fieldbus bit output 14" />
+          <Text TextId="dTId_700574_94218" Value="Fieldbus bit input 15" />
+          <Text TextId="dTId_700575_94218" Value="Fieldbus bit output 15" />
+          <Text TextId="dTId_700576_94218" Value="Fieldbus bit input 10" />
+          <Text TextId="dTId_700577_94218" Value="Fieldbus bit output 10" />
+          <Text TextId="gPngHc_dap" Value="TBPN-Safe" />
+          <Text TextId="gPngHc_DAP_TBPN_L5_4FDI_4FDX_Name" Value="TBPN-L5-4FDI-4FDX" />
+          <Text TextId="gPngHc_DAP_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC_Name" Value="TBPN-L5-4FDI-4FDX use for non-safe PLC" />
+          <Text TextId="gPxtId_100" Value="Output overload - port 0" />
+          <Text TextId="gPxtId_102" Value="Wait for input signal - port 1" />
+          <Text TextId="gPxtId_103" Value="Test input - port 1" />
+          <Text TextId="gPxtId_104" Value="Input error - port 1" />
+          <Text TextId="gPxtId_105" Value="Cross-circuit channel 0 - port 0" />
+          <Text TextId="gPxtId_106" Value="Cross-circuit channel 1 - port 1" />
+          <Text TextId="gPxtId_107" Value="Output overload - port 1" />
+          <Text TextId="gPxtId_109" Value="Wait for input signal - port 2" />
+          <Text TextId="gPxtId_11" Value="DAP v3.1" />
+          <Text TextId="gPxtId_110" Value="Test input - port 2" />
+          <Text TextId="gPxtId_111" Value="Input error - port 2" />
+          <Text TextId="gPxtId_112" Value="Cross-circuit channel 0 - port 2" />
+          <Text TextId="gPxtId_113" Value="Cross-circuit channel 1 - port 2" />
+          <Text TextId="gPxtId_114" Value="Output overload - port 2" />
+          <Text TextId="gPxtId_116" Value="Wait for input signal - port 3" />
+          <Text TextId="gPxtId_117" Value="Test input - port 3" />
+          <Text TextId="gPxtId_118" Value="Input error - port 3" />
+          <Text TextId="gPxtId_119" Value="Cross-circuit channel 0 - port 3" />
+          <Text TextId="gPxtId_120" Value="Cross-circuit channel 1 - port 3" />
+          <Text TextId="gPxtId_121" Value="Output overload - port 3" />
+          <Text TextId="gPxtId_123" Value="Wait for input signal - port 4" />
+          <Text TextId="gPxtId_124" Value="Test input - port 4" />
+          <Text TextId="gPxtId_125" Value="Input error - port 4" />
+          <Text TextId="gPxtId_126" Value="Cross-circuit channel 0 - port 4" />
+          <Text TextId="gPxtId_127" Value="Cross-circuit channel 1 - port 4" />
+          <Text TextId="gPxtId_128" Value="Output overload - port 4" />
+          <Text TextId="gPxtId_130" Value="Wait for input signal - port 5" />
+          <Text TextId="gPxtId_131" Value="Test input - port 5" />
+          <Text TextId="gPxtId_132" Value="Input error - port 5" />
+          <Text TextId="gPxtId_133" Value="Cross-circuit channel 0 - port 5" />
+          <Text TextId="gPxtId_134" Value="Cross-circuit channel 1 - port 5" />
+          <Text TextId="gPxtId_135" Value="Output overload - port 5" />
+          <Text TextId="gPxtId_137" Value="Wait for input signal - port 7" />
+          <Text TextId="gPxtId_138" Value="Test input - port 7" />
+          <Text TextId="gPxtId_139" Value="Input error - port 7" />
+          <Text TextId="gPxtId_140" Value="Cross-circuit channel 0 - port 7" />
+          <Text TextId="gPxtId_141" Value="Cross-circuit channel 1 - port 7" />
+          <Text TextId="gPxtId_142" Value="Output overload - port 7" />
+          <Text TextId="gPxtId_144" Value="Port 0 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_145" Value="Port 0 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_146" Value="Port 0 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_147" Value="Port 0, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_148" Value="Port 0, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_149" Value="Port 0 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_15" Value="parameterization error" />
+          <Text TextId="gPxtId_151" Value="Port 1 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_152" Value="Port 1 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_153" Value="Port 1 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_154" Value="Port 1, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_155" Value="Port 1, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_156" Value="Port 1 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_158" Value="Port 2 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_159" Value="Port 2 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_16" Value="After validity check the parameter data is (possibly partially) rejected by the module. Check context of parameters." />
+          <Text TextId="gPxtId_160" Value="Port 2 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_161" Value="Port 2, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_162" Value="Port 2, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_163" Value="Port 2 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_165" Value="Port 3 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_166" Value="Port 3 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_167" Value="Port 3 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_168" Value="Port 3, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_169" Value="Port 3, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_170" Value="Port 3 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_172" Value="Port 4 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_173" Value="Port 4 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_174" Value="Port 4 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_175" Value="Port 4, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_176" Value="Port 4, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_177" Value="Port 4 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_179" Value="Port 5 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_180" Value="Port 5 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_181" Value="Port 5 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_182" Value="Port 5, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_183" Value="Port 5, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_184" Value="Port 5 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_186" Value="Port 7 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_187" Value="Port 7 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_188" Value="Port 7 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_189" Value="Port 7, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_190" Value="Port 7, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_191" Value="Port 7 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_193" Value="Wait for input signal - port 6" />
+          <Text TextId="gPxtId_194" Value="Test input - port 6" />
+          <Text TextId="gPxtId_195" Value="Input error - port 6" />
+          <Text TextId="gPxtId_196" Value="Cross-circuit channel 0 - port 6" />
+          <Text TextId="gPxtId_197" Value="Cross-circuit channel 1 - port 6" />
+          <Text TextId="gPxtId_198" Value="Output overload - port 6" />
+          <Text TextId="gPxtId_200" Value="Port 6 - Only one channel of two required active. Device waits for second channel." />
+          <Text TextId="gPxtId_201" Value="Port 6 - Only one channel of two required active. Device waits for both channels to switch simultaneously." />
+          <Text TextId="gPxtId_202" Value="Port 6 - Error at input. Check configuration and cabling." />
+          <Text TextId="gPxtId_203" Value="Port 6, channel 0 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_204" Value="Port 6, channel 1 - Cross-circuit at channel. Check cabling." />
+          <Text TextId="gPxtId_205" Value="Port 6 - Overload at output. Check connected load." />
+          <Text TextId="gPxtId_206" Value="Fatal error. Check safety-configuration, cabling and device." />
+          <Text TextId="gPxtId_21" Value="hardware failure" />
+          <Text TextId="gPxtId_210" Value="Overcurrent supply VAUX1 Ch12/13" />
+          <Text TextId="gPxtId_213" Value="The module detected an overcurrent of supply VAUX1 at channel 12/13." />
+          <Text TextId="gPxtId_22" Value="The module detected a hardware failure. Exchange module." />
+          <Text TextId="gPxtId_23" Value="communication failure" />
+          <Text TextId="gPxtId_24" Value="The module detected a communication problem at its ports, e. g. RS232/485/422, SSI or other interface. Check connection resp. function of attached devices." />
+          <Text TextId="gPxtId_241" Value="Overcurrent supply FSO0 Ch8/9" />
+          <Text TextId="gPxtId_242" Value="The module detected an overcurrent of the internal supply at channel 8/9." />
+          <Text TextId="gPxtId_243" Value="Overcurrent supply FSO0 CH10/11" />
+          <Text TextId="gPxtId_244" Value="The module detected an overcurrent of the internal supply FSO0 at channel 10/11." />
+          <Text TextId="gPxtId_25" Value="direction error" />
+          <Text TextId="gPxtId_26" Value="The direction is detected to be wrong. Check parameterization resp. control interface versus use case." />
+          <Text TextId="gPxtId_27" Value="user software error" />
+          <Text TextId="gPxtId_28" Value="The module detected an user application software error. Check interoperability of user application software revisions. Reinitialize user application software of the module." />
+          <Text TextId="gPxtId_29" Value="sensor supply load dump" />
+          <Text TextId="gPxtId_30" Value="The module detected a load dump at sensor supply." />
+          <Text TextId="gPxtId_31" Value="common error" />
+          <Text TextId="gPxtId_32" Value="The module detected an error. Refer to manual for a more detailed description of possible errors. Error types can depend on operation mode and parameterization." />
+          <Text TextId="gPxtId_33" Value="configuration error" />
+          <Text TextId="gPxtId_34" Value="After validity check the configuration data is (possibly partially) rejected. Check context." />
+          <Text TextId="gPxtId_35" Value="PN-IO" />
+          <Text TextId="gPxtId_36" Value="Port 1" />
+          <Text TextId="gPxtId_37" Value="Port 2" />
+          <Text TextId="gPxtId_4" Value="PROFINET IO Block module in IP67" />
+          <Text TextId="gPxtId_534" Value="PROFINET-RT device with 2 ports; Port diagnosis; IM functionality; Topology recognition; Netload class 3" />
+          <Text TextId="gPxtId_62" Value="TBPN line topology PROFINET" />
+          <Text TextId="gPxtId_63" Value="Destination address mismatch" />
+          <Text TextId="gPxtId_64" Value="Invalid destination address" />
+          <Text TextId="gPxtId_65" Value="Invalid source address" />
+          <Text TextId="gPxtId_66" Value="Invalid watchdog time value" />
+          <Text TextId="gPxtId_67" Value="SIL value exceeded" />
+          <Text TextId="gPxtId_68" Value="Invalid length of CRC2" />
+          <Text TextId="gPxtId_69" Value="Invalid PROFIsafe version" />
+          <Text TextId="gPxtId_70" Value="CRC1 mismatch" />
+          <Text TextId="gPxtId_71" Value="Inconsistent parameterization" />
+          <Text TextId="gPxtId_72" Value="iParameter CRC mismatch" />
+          <Text TextId="gPxtId_73" Value="The destination address given in the PROFIsafe parameters does not match the one configured on the device." />
+          <Text TextId="gPxtId_74" Value="The destination address given in the PROFIsafe parameters is invalid (0 or 65535)." />
+          <Text TextId="gPxtId_75" Value="The source address given in the PROFIsafe parameters is invalid (0 or 65535)." />
+          <Text TextId="gPxtId_76" Value="The PROFIsafe watchdog time is invalid." />
+          <Text TextId="gPxtId_77" Value="The SIL value exceeds the maximum SIL achievable with the device." />
+          <Text TextId="gPxtId_78" Value="The length of the PROFIsafe data CRC does not match the PROFIsafe version." />
+          <Text TextId="gPxtId_79" Value="The PROFIsafe version given in the PROFIsafe parameters is not supported by the device." />
+          <Text TextId="gPxtId_80" Value="The CRC in the PROFIsafe parameters does not match." />
+          <Text TextId="gPxtId_81" Value="There are inconsistencies in the PROFIsafe parameterization." />
+          <Text TextId="gPxtId_82" Value="The iParameter CRC does not match the device configuration." />
+          <Text TextId="gPxtId_83" Value="Fatal error" />
+          <Text TextId="gPxtId_84" Value="Communication loss" />
+          <Text TextId="gPxtId_86" Value="Configuration missmatch" />
+          <Text TextId="gPxtId_87" Value="No safety configuration available" />
+          <Text TextId="gPxtId_88" Value="No memory stick plugged" />
+          <Text TextId="gPxtId_89" Value="Communication error. Check configuration and cabling." />
+          <Text TextId="gPxtId_91" Value="Configuration in device does not match configuration in memory stick. Delete configuration in memory stick." />
+          <Text TextId="gPxtId_92" Value="No safety configuration in device. Configure device with Turck Safety Configurator." />
+          <Text TextId="gPxtId_93" Value="Memory stick not found. Plug memory stick for later device replacement." />
+          <Text TextId="gPxtId_95" Value="Wait for input signal - port 0" />
+          <Text TextId="gPxtId_96" Value="Test input - port 0" />
+          <Text TextId="gPxtId_97" Value="Input error - port 0" />
+          <Text TextId="gPxtId_98" Value="Cross-circuit channel 0 - port 0" />
+          <Text TextId="gPxtId_99" Value="Cross-circuit channel 1 - port 0" />
+          <Text TextId="gTId_276" Value="Fieldbus configuration" />
+          <Text TextId="gTId_393_47" Value="Deactivate all diagnostics" />
+          <Text TextId="gTId_397_47" Value="Deactivate I/O-ASS. Force Mode" />
+          <Text TextId="gTId_461_47" Value="Deactivate WEB server" />
+          <Text TextId="gTId_462" Value="yes" />
+          <Text TextId="gTId_463" Value="no" />
+          <Text TextId="gTId_510" Value="PROFINET configuration" />
+          <Text TextId="gTId_552" Value="Module status" />
+          <Text TextId="gTId_559" Value="PROFIsafe" />
+          <Text TextId="gTId_560" Value="Safety status" />
+          <Text TextId="gTId_654" Value="Fieldbus Bits" />
+        </PrimaryLanguage>
+        <Language xml:lang="de">
+          <Text TextId="txtX1" Value="X1" />
+          <Text TextId="txtX1P1" Value="X1 P1" />
+          <Text TextId="txtX1P2" Value="X1 P2" />
+          <Text TextId="txtSlotParam" Value="Modul-Parametrierung" />
+          <!-- PROFISAFE Additions -->
+          <Text TextId="IDT_PS_FIN" Value="Sichere Eingangsdaten" />
+          <Text TextId="IDT_PS_FOUT" Value="Sichere Ausgangsdaten" />
+          <Text TextId="IDT_PS_TRAILER" Value="PROFIsafe-Nachspann" />
+          <Text TextId="IDTM_PS12" Value="PROFIsafe-Modul" />
+          <Text TextId="IDTI_PS12" Value="2 Byte sicherheitsgerichtete E/A-Daten (+ 4 Byte PROFIsafe-Nachspann)" />
+          <Text TextId="txtAktivieren" Value="aktivieren" />
+          <Text TextId="txtDeaktivieren" Value="deaktivieren" />
+          <Text TextId="dPngGmo_479_Module_status" Value="Modulstatus" />
+          <Text TextId="dPngGmo_480_Safety_status" Value="Safety-Status" />
+          <Text TextId="dPngGmo_481_Safety_Fieldbus_Bits" Value="Safety Feldbus Bits" />
+          <Text TextId="dTId_138380" Value="Reserviert" />
+          <Text TextId="dTId_698783" Value="Modulstatus" />
+          <Text TextId="dTId_698792_94141" Value="I/O-ASSISTANT-Force Mode aktiv" />
+          <Text TextId="dTId_698795_94141" Value="Moduldiagnose liegt an" />
+          <Text TextId="dTId_698796_94141" Value="Unterspannung V1" />
+          <Text TextId="dTId_699139_94141" Value="Interner Fehler" />
+          <Text TextId="dTId_699180" Value="Sichere Diagnosen C 1" />
+          <Text TextId="dTId_699181" Value="Sichere Diagnosen C 2" />
+          <Text TextId="dTId_699182" Value="Sichere Diagnosen C 3" />
+          <Text TextId="dTId_699183" Value="Sichere Diagnosen C 4" />
+          <Text TextId="dTId_699184" Value="Sichere Diagnosen C 5" />
+          <Text TextId="dTId_699185" Value="Sichere Diagnosen C 6" />
+          <Text TextId="dTId_699186" Value="Sichere Diagnosen C 7" />
+          <Text TextId="dTId_699188" Value="Status sichere Einheit" />
+          <Text TextId="dTId_699189" Value="Fehlercodes sichere Einheit" />
+          <Text TextId="dTId_699190" Value="Integritaet der sicheren Konfiguration" />
+          <Text TextId="dTId_699192_94150Ch0" Value="Normaler Betriebsstatus C0" />
+          <Text TextId="dTId_699192_94150Ch1" Value="Normaler Betriebsstatus C1" />
+          <Text TextId="dTId_699192_94150Ch2" Value="Normaler Betriebsstatus C2" />
+          <Text TextId="dTId_699192_94150Ch3" Value="Normaler Betriebsstatus C3" />
+          <Text TextId="dTId_699192_94150Ch4" Value="Normaler Betriebsstatus C4" />
+          <Text TextId="dTId_699192_94150Ch5" Value="Normaler Betriebsstatus C5" />
+          <Text TextId="dTId_699192_94150Ch6" Value="Normaler Betriebsstatus C6" />
+          <Text TextId="dTId_699192_94150Ch7" Value="Normaler Betriebsstatus C7" />
+          <Text TextId="dTId_699193_94150Ch0" Value="Warten auf Eingangssignal C0" />
+          <Text TextId="dTId_699193_94150Ch1" Value="Warten auf Eingangssignal C1" />
+          <Text TextId="dTId_699193_94150Ch2" Value="Warten auf Eingangssignal C2" />
+          <Text TextId="dTId_699193_94150Ch3" Value="Warten auf Eingangssignal C3" />
+          <Text TextId="dTId_699193_94150Ch4" Value="Warten auf Eingangssignal C4" />
+          <Text TextId="dTId_699193_94150Ch5" Value="Warten auf Eingangssignal C5" />
+          <Text TextId="dTId_699193_94150Ch6" Value="Warten auf Eingangssignal C6" />
+          <Text TextId="dTId_699193_94150Ch7" Value="Warten auf Eingangssignal C7" />
+          <Text TextId="dTId_699194_94150Ch0" Value="Eingang testen C0" />
+          <Text TextId="dTId_699194_94150Ch1" Value="Eingang testen C1" />
+          <Text TextId="dTId_699194_94150Ch2" Value="Eingang testen C2" />
+          <Text TextId="dTId_699194_94150Ch3" Value="Eingang testen C3" />
+          <Text TextId="dTId_699194_94150Ch4" Value="Eingang testen C4" />
+          <Text TextId="dTId_699194_94150Ch5" Value="Eingang testen C5" />
+          <Text TextId="dTId_699194_94150Ch6" Value="Eingang testen C6" />
+          <Text TextId="dTId_699194_94150Ch7" Value="Eingang testen C7" />
+          <Text TextId="dTId_699195_94150Ch0" Value="Fehler am Eingang C0" />
+          <Text TextId="dTId_699195_94150Ch1" Value="Fehler am Eingang C1" />
+          <Text TextId="dTId_699195_94150Ch2" Value="Fehler am Eingang C2" />
+          <Text TextId="dTId_699195_94150Ch3" Value="Fehler am Eingang C3" />
+          <Text TextId="dTId_699195_94150Ch4" Value="Fehler am Eingang C4" />
+          <Text TextId="dTId_699195_94150Ch5" Value="Fehler am Eingang C5" />
+          <Text TextId="dTId_699195_94150Ch6" Value="Fehler am Eingang C6" />
+          <Text TextId="dTId_699195_94150Ch7" Value="Fehler am Eingang C7" />
+          <Text TextId="dTId_699196_94150Ch0" Value="Querschluss Kanal 0 C0" />
+          <Text TextId="dTId_699196_94150Ch1" Value="Querschluss Kanal 0 C1" />
+          <Text TextId="dTId_699196_94150Ch2" Value="Querschluss Kanal 0 C2" />
+          <Text TextId="dTId_699196_94150Ch3" Value="Querschluss Kanal 0 C3" />
+          <Text TextId="dTId_699196_94150Ch4" Value="Querschluss Kanal 0 C4" />
+          <Text TextId="dTId_699196_94150Ch5" Value="Querschluss Kanal 0 C5" />
+          <Text TextId="dTId_699196_94150Ch6" Value="Querschluss Kanal 0 C6" />
+          <Text TextId="dTId_699196_94150Ch7" Value="Querschluss Kanal 0 C7" />
+          <Text TextId="dTId_699197_94150Ch0" Value="Querschluss Kanal 1 C0" />
+          <Text TextId="dTId_699197_94150Ch1" Value="Querschluss Kanal 1 C1" />
+          <Text TextId="dTId_699197_94150Ch2" Value="Querschluss Kanal 1 C2" />
+          <Text TextId="dTId_699197_94150Ch3" Value="Querschluss Kanal 1 C3" />
+          <Text TextId="dTId_699197_94150Ch4" Value="Querschluss Kanal 1 C4" />
+          <Text TextId="dTId_699197_94150Ch5" Value="Querschluss Kanal 1 C5" />
+          <Text TextId="dTId_699197_94150Ch6" Value="Querschluss Kanal 1 C6" />
+          <Text TextId="dTId_699197_94150Ch7" Value="Querschluss Kanal 1 C7" />
+          <Text TextId="dTId_699198_94150Ch0" Value="Ausgangsueberlast C0" />
+          <Text TextId="dTId_699198_94150Ch1" Value="Ausgangsueberlast C1" />
+          <Text TextId="dTId_699198_94150Ch2" Value="Ausgangsueberlast C2" />
+          <Text TextId="dTId_699198_94150Ch3" Value="Ausgangsueberlast C3" />
+          <Text TextId="dTId_699198_94150Ch4" Value="Ausgangsueberlast C4" />
+          <Text TextId="dTId_699198_94150Ch5" Value="Ausgangsueberlast C5" />
+          <Text TextId="dTId_699198_94150Ch6" Value="Ausgangsueberlast C6" />
+          <Text TextId="dTId_699198_94150Ch7" Value="Ausgangsueberlast C7" />
+          <Text TextId="dTId_699199_94150" Value="Falsche Zieladresse" />
+          <Text TextId="dTId_699200_94150" Value="Ungueltige Zieladresse" />
+          <Text TextId="dTId_699201_94150" Value="Ungueltige Quelladresse" />
+          <Text TextId="dTId_699202_94150" Value="Ungueltige Watchdog-Zeit" />
+          <Text TextId="dTId_699203_94150" Value="SIL-Wert ueberschritten" />
+          <Text TextId="dTId_699204_94150" Value="Ungueltige CRC2-Laenge" />
+          <Text TextId="dTId_699205_94150" Value="Ungueltige PROFIsafe-Version" />
+          <Text TextId="dTId_699206_94150" Value="Falsche CRC1" />
+          <Text TextId="dTId_699207_94150" Value="Falsche PROFIsafe-Parameter" />
+          <Text TextId="dTId_699208_94150" Value="Falsche iPararameterCRC" />
+          <Text TextId="dTId_699209_94150" Value="Schwerwiegender Ausnahmefehler" />
+          <Text TextId="dTId_699210_94150" Value="Kommunikationsverlust" />
+          <Text TextId="dTId_699212_94150" Value="Unterschiedliche Konfigurationen vorhanden" />
+          <Text TextId="dTId_699213_94150" Value="Keine Konfiguration vorhanden" />
+          <Text TextId="dTId_699214_94150" Value="Kein Speicherstick vorhanden" />
+          <Text TextId="dTId_699226_94150" Value="Entsperren sichere Einheit" />
+          <Text TextId="dTId_699245" Value="Steuerung sichere Einheit" />
+          <Text TextId="dTId_699246_94150" Value="Geschuetzter Betriebsmodus" />
+          <Text TextId="dTId_699247_94150" Value="Geschuetzter Konfigurationsmodus" />
+          <Text TextId="dTId_699248_94150" Value="Unbekannter Modus" />
+          <Text TextId="dTId_699259" Value="Sichere Diagnosen C 0" />
+          <Text TextId="dTId_700318_94218" Value="Feldbusbit Eingang 0" />
+          <Text TextId="dTId_700319_94218" Value="Feldbusbit Ausgang 0" />
+          <Text TextId="dTId_700548_94218" Value="Feldbusbit Eingang 1" />
+          <Text TextId="dTId_700549_94218" Value="Feldbusbit Ausgang 1" />
+          <Text TextId="dTId_700550_94218" Value="Feldbusbit Eingang 2" />
+          <Text TextId="dTId_700551_94218" Value="Feldbusbit Ausgang 2" />
+          <Text TextId="dTId_700552_94218" Value="Feldbusbit Eingang 3" />
+          <Text TextId="dTId_700553_94218" Value="Feldbusbit Ausgang 3" />
+          <Text TextId="dTId_700554_94218" Value="Feldbusbit Eingang 4" />
+          <Text TextId="dTId_700555_94218" Value="Feldbusbit Ausgang 4" />
+          <Text TextId="dTId_700556_94218" Value="Feldbusbit Eingang 5" />
+          <Text TextId="dTId_700557_94218" Value="Feldbusbit Ausgang 5" />
+          <Text TextId="dTId_700558_94218" Value="Feldbusbit Eingang 6" />
+          <Text TextId="dTId_700559_94218" Value="Feldbusbit Ausgang 6" />
+          <Text TextId="dTId_700560_94218" Value="Feldbusbit Eingang 7" />
+          <Text TextId="dTId_700561_94218" Value="Feldbusbit Ausgang 7" />
+          <Text TextId="dTId_700562_94218" Value="Feldbusbit Eingang 8" />
+          <Text TextId="dTId_700563_94218" Value="Feldbusbit Ausgang 8" />
+          <Text TextId="dTId_700564_94218" Value="Feldbusbit Eingang 9" />
+          <Text TextId="dTId_700565_94218" Value="Feldbusbit Ausgang 9" />
+          <Text TextId="dTId_700566_94218" Value="Feldbusbit Eingang 11" />
+          <Text TextId="dTId_700567_94218" Value="Feldbusbit Ausgang 11" />
+          <Text TextId="dTId_700568_94218" Value="Feldbusbit Eingang 12" />
+          <Text TextId="dTId_700569_94218" Value="Feldbusbit Ausgang 12" />
+          <Text TextId="dTId_700570_94218" Value="Feldbusbit Eingang 13" />
+          <Text TextId="dTId_700571_94218" Value="Feldbusbit Ausgang 13" />
+          <Text TextId="dTId_700572_94218" Value="Feldbusbit Eingang 14" />
+          <Text TextId="dTId_700573_94218" Value="Feldbusbit Ausgang 14" />
+          <Text TextId="dTId_700574_94218" Value="Feldbusbit Eingang 15" />
+          <Text TextId="dTId_700575_94218" Value="Feldbusbit Ausgang 15" />
+          <Text TextId="dTId_700576_94218" Value="Feldbusbit Eingang 10" />
+          <Text TextId="dTId_700577_94218" Value="Feldbusbit Ausgang 10" />
+          <Text TextId="gPngHc_dap" Value="TBPN-Safe" />
+          <Text TextId="gPngHc_DAP_TBPN_L5_4FDI_4FDX_Name" Value="TBPN-L5-4FDI-4FDX" />
+          <Text TextId="gPngHc_DAP_TBPN_L5_4FDI_4FDX_use_for_non_safe_PLC_Name" Value="TBPN-L5-4FDI-4FDX use for non-safe PLC" />
+          <Text TextId="gPxtId_100" Value="Ausgangsueberlast - Port 0" />
+          <Text TextId="gPxtId_102" Value="Warten auf Eingangssignal - Port 1" />
+          <Text TextId="gPxtId_103" Value="Eingang testen  - Port 1" />
+          <Text TextId="gPxtId_104" Value="Fehler am Eingang - Port 1" />
+          <Text TextId="gPxtId_105" Value="Querschluss Kanal 0 - Port 1" />
+          <Text TextId="gPxtId_106" Value="Querschluss Kanal 1 - Port 1" />
+          <Text TextId="gPxtId_107" Value="Ausgangsueberlast - Port 1" />
+          <Text TextId="gPxtId_109" Value="Warten auf Eingangssignal - Port 2" />
+          <Text TextId="gPxtId_11" Value="DAP v3.1" />
+          <Text TextId="gPxtId_110" Value="Eingang testen  - Port 2" />
+          <Text TextId="gPxtId_111" Value="Fehler am Eingang - Port 2" />
+          <Text TextId="gPxtId_112" Value="Querschluss Kanal 0 - Port 2" />
+          <Text TextId="gPxtId_113" Value="Querschluss Kanal 1 - Port 2" />
+          <Text TextId="gPxtId_114" Value="Ausgangsueberlast - Port 2" />
+          <Text TextId="gPxtId_116" Value="Warten auf Eingangssignal - Port 3" />
+          <Text TextId="gPxtId_117" Value="Eingang testen  - Port 3" />
+          <Text TextId="gPxtId_118" Value="Fehler am Eingang - Port 3" />
+          <Text TextId="gPxtId_119" Value="Querschluss Kanal 0 - Port 3" />
+          <Text TextId="gPxtId_120" Value="Querschluss Kanal 1 - Port 3" />
+          <Text TextId="gPxtId_121" Value="Ausgangsueberlast - Port 3" />
+          <Text TextId="gPxtId_123" Value="Warten auf Eingangssignal - Port 4" />
+          <Text TextId="gPxtId_124" Value="Eingang testen  - Port 4" />
+          <Text TextId="gPxtId_125" Value="Fehler am Eingang - Port 4" />
+          <Text TextId="gPxtId_126" Value="Querschluss Kanal 0 - Port 4" />
+          <Text TextId="gPxtId_127" Value="Querschluss Kanal 1 - Port 4" />
+          <Text TextId="gPxtId_128" Value="Ausgangsueberlast - Port 4" />
+          <Text TextId="gPxtId_130" Value="Warten auf Eingangssignal - Port 5" />
+          <Text TextId="gPxtId_131" Value="Eingang testen  - Port 5" />
+          <Text TextId="gPxtId_132" Value="Fehler am Eingang - Port 5" />
+          <Text TextId="gPxtId_133" Value="Querschluss Kanal 0 - Port 5" />
+          <Text TextId="gPxtId_134" Value="Querschluss Kanal 1 - Port 5" />
+          <Text TextId="gPxtId_135" Value="Ausgangsueberlast - Port 5" />
+          <Text TextId="gPxtId_137" Value="Warten auf Eingangssignal - Port 7" />
+          <Text TextId="gPxtId_138" Value="Eingang testen  - Port 7" />
+          <Text TextId="gPxtId_139" Value="Fehler am Eingang - Port 7" />
+          <Text TextId="gPxtId_140" Value="Querschluss Kanal 0 - Port 7" />
+          <Text TextId="gPxtId_141" Value="Querschluss Kanal 1 - Port 7" />
+          <Text TextId="gPxtId_142" Value="Ausgangsueberlast - Port 7" />
+          <Text TextId="gPxtId_144" Value="Port 0 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_145" Value="Port 0 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_146" Value="Port 0 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_147" Value="Port 0, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_148" Value="Port 0, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_149" Value="Port 0 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_15" Value="Parametrierungsfehler" />
+          <Text TextId="gPxtId_151" Value="Port 1 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_152" Value="Port 1 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_153" Value="Port 1 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_154" Value="Port 1, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_155" Value="Port 1, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_156" Value="Port 1 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_158" Value="Port 2 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_159" Value="Port 2 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_16" Value="Nach der Plausibilitaetspruefung wird der Parameter-Datensatz (ev. teilweise) abgelehnt. Pruefen Sie den Kontext der Parameter-Daten." />
+          <Text TextId="gPxtId_160" Value="Port 2 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_161" Value="Port 2, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_162" Value="Port 2, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_163" Value="Port 2 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_165" Value="Port 3 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_166" Value="Port 3 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_167" Value="Port 3 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_168" Value="Port 3, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_169" Value="Port 3, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_170" Value="Port 3 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_172" Value="Port 4 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_173" Value="Port 4 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_174" Value="Port 4 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_175" Value="Port 4, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_176" Value="Port 4, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_177" Value="Port 4 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_179" Value="Port 5 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_180" Value="Port 5 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_181" Value="Port 5 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_182" Value="Port 5, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_183" Value="Port 5, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_184" Value="Port 5 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_186" Value="Port 7 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_187" Value="Port 7 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_188" Value="Port 7 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_189" Value="Port 7, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_190" Value="Port 7, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_191" Value="Port 7 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_193" Value="Warten auf Eingangssignal - Port 6" />
+          <Text TextId="gPxtId_194" Value="Eingang testen  - Port 6" />
+          <Text TextId="gPxtId_195" Value="Fehler am Eingang - Port 6" />
+          <Text TextId="gPxtId_196" Value="Querschluss Kanal 0 - Port 6" />
+          <Text TextId="gPxtId_197" Value="Querschluss Kanal 1 - Port 6" />
+          <Text TextId="gPxtId_198" Value="Ausgangsueberlast - Port 6" />
+          <Text TextId="gPxtId_200" Value="Port 6 - Nur ein Kanal von zwei benoetigten aktiv. Geraet wartet auf zweiten Kanal." />
+          <Text TextId="gPxtId_201" Value="Port 6 - Nur ein Kanal von zwei benoetigten aktiv. Geraet erwartet gleichzeitiges Schalten beider Kanaele." />
+          <Text TextId="gPxtId_202" Value="Port 6 - Fehler am Eingang. Safety-Konfiguration und Verkabelung pruefen." />
+          <Text TextId="gPxtId_203" Value="Port 6, Kanal 0 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_204" Value="Port 6, Kanal 1 - Querschluss am Kanal. Verkabelung ueberpruefen." />
+          <Text TextId="gPxtId_205" Value="Port 6 - Ueberlast am Ausgang. Angeschlossene Last ueberpruefen." />
+          <Text TextId="gPxtId_206" Value="Schwerwiegender Ausnahmefehler. Safety-Konfiguration, Verkabelung und Geraet pruefen." />
+          <Text TextId="gPxtId_21" Value="Hardware-Fehler" />
+          <Text TextId="gPxtId_210" Value="Ueberstrom Versorgung VAUX1 K12/13" />
+          <Text TextId="gPxtId_213" Value="Das Modul hat einen zu grossen Strom der Versorgung VAUX1 am Kanal 12/13 festgestellt." />
+          <Text TextId="gPxtId_22" Value="Das Modul hat einen Hardware-Fehler erkannt. Tauschen Sie das Modul." />
+          <Text TextId="gPxtId_23" Value="Kommunikationsfehler" />
+          <Text TextId="gPxtId_24" Value="Das Modul hat Kommunikationsprobleme an den Ports (z. B. RS232/485/422, SSI oder andere Schnittstelle) festgestellt. Pruefen Sie die Verbindung zu angeschlossenen Geraeten bzw. deren Funktion." />
+          <Text TextId="gPxtId_241" Value="Ueberstrom Versorgung FSO0 K8/9" />
+          <Text TextId="gPxtId_242" Value="Das Modul hat einen zu grossen Strom der internen Versorgung ueber FSO0 am Kanal 8/9 festgestellt." />
+          <Text TextId="gPxtId_243" Value="Ueberstrom Versorgung FSO0 K10/11" />
+          <Text TextId="gPxtId_244" Value="Das Modul hat einen zu grossen Strom der internen Versorgung ueber FSO0 am Kanal 10/11 festgestellt." />
+          <Text TextId="gPxtId_25" Value="Richtungsfehler" />
+          <Text TextId="gPxtId_26" Value="Die Richtung wurde als falsch erkannt. Pruefen Sie die Parametrierung bzw. die Steuerschnittstelle gegen den Anwendungsfall." />
+          <Text TextId="gPxtId_27" Value="Anwendersoftware-Fehler" />
+          <Text TextId="gPxtId_28" Value="Das Modul hat einen Anwendersoftware-Fehler festgestellt. Pruefen Sie die Interoperabilitaet der Anwendersoftware-Versionen. Reinitialisieren Sie die Anwendersoftware." />
+          <Text TextId="gPxtId_29" Value="Ueberlast Sensorversorgung" />
+          <Text TextId="gPxtId_30" Value="Das Modul hat einen zu grossen Strom an der Sensorversorgung festgestellt." />
+          <Text TextId="gPxtId_31" Value="Sammelfehler" />
+          <Text TextId="gPxtId_32" Value="Das Modul hat einen Fehler festgestellt. Moegliche Fehler koennen der Dokumentation entnommen werden. Der Fehlertyp kann von Betriebsart und Parametrierung abhaengig sein." />
+          <Text TextId="gPxtId_33" Value="Konfigurationsfehler" />
+          <Text TextId="gPxtId_34" Value="Nach der Plausibilitaetspruefung wird der Konfigurations-Datensatz (ev. teilweise) abgelehnt. Pruefen Sie den Kontext." />
+          <Text TextId="gPxtId_35" Value="PN-IO" />
+          <Text TextId="gPxtId_36" Value="Port 1" />
+          <Text TextId="gPxtId_37" Value="Port 2" />
+          <Text TextId="gPxtId_4" Value="PROFINET IO Block Modul in IP67" />
+          <Text TextId="gPxtId_534" Value="PROFINET-RT Geraet mit 2 Ports; Port Diagnose; IM Funktionalitaet; Topology Erkennung; Netzlastklasse 3" />
+          <Text TextId="gPxtId_62" Value="TBPN Linientopologie PROFINET" />
+          <Text TextId="gPxtId_63" Value="Falsche Zieladresse" />
+          <Text TextId="gPxtId_64" Value="Ungueltige Zieladresse" />
+          <Text TextId="gPxtId_65" Value="Ungueltige Quelladresse" />
+          <Text TextId="gPxtId_66" Value="Ungueltige Watchdogzeit" />
+          <Text TextId="gPxtId_67" Value="Uebergebene SIL-Klasse zu hoch" />
+          <Text TextId="gPxtId_68" Value="Ungueltige CRC2-Laenge" />
+          <Text TextId="gPxtId_69" Value="Ungueltige PROFIsafe-Version" />
+          <Text TextId="gPxtId_70" Value="CRC1-Fehler" />
+          <Text TextId="gPxtId_71" Value="Parametrierung inkonsistent" />
+          <Text TextId="gPxtId_72" Value="Ungueltige iParCRC" />
+          <Text TextId="gPxtId_73" Value="Die uebergebene PROFIsafe-Zieladresse ist nicht am Geraet eingestellt." />
+          <Text TextId="gPxtId_74" Value="Die uebergebene PRORIsafe-Zieladresse ist ungueltig (0 oder 65535)." />
+          <Text TextId="gPxtId_75" Value="Die PROFIsafe-Quelladresse ist ungueltig (0 oder 65535)." />
+          <Text TextId="gPxtId_76" Value="Die PROFIsafe-Watchdogzeit ist ungueltig." />
+          <Text TextId="gPxtId_77" Value="Die uebergebene SIL-Klasse ist mit dem Geraet nicht erreichbar." />
+          <Text TextId="gPxtId_78" Value="Die Laenge der PROFIsafe-Daten-CRC passt nicht zur PROFIsafe-Version." />
+          <Text TextId="gPxtId_79" Value="Die PROFIsafe-Version wird vom Geraet nicht unterstuetzt." />
+          <Text TextId="gPxtId_80" Value="Die CRC der PROFIsafe-Parameter ist falsch." />
+          <Text TextId="gPxtId_81" Value="Die PROFIsafe-Parametrierung ist inkonsistent." />
+          <Text TextId="gPxtId_82" Value="Die iParameter-CRC entspricht nicht der Geraetekonfiguration." />
+          <Text TextId="gPxtId_83" Value="Schwerwiegender Ausnahmefehler" />
+          <Text TextId="gPxtId_84" Value="Kommunikationsverlust" />
+          <Text TextId="gPxtId_86" Value="Unterschiedliche Konfigurationen vorhanden" />
+          <Text TextId="gPxtId_87" Value="Keine Konfiguration vorhanden" />
+          <Text TextId="gPxtId_88" Value="Kein Speicherstick vorhanden" />
+          <Text TextId="gPxtId_89" Value="Kommunikationsfehler aufgetreten. Verkabelung und Konfiguration pruefen." />
+          <Text TextId="gPxtId_91" Value="Safety-Konfiguration im Geraet entspricht nicht der Konfiguration im Speicherstick. Konfiguration im Speicherstick loeschen." />
+          <Text TextId="gPxtId_92" Value="Keine Safety-Konfiguration im Geraet. Modul mit dem Turck Safety Configurator konfigurieren." />
+          <Text TextId="gPxtId_93" Value="Speicherstick nicht gefunden. Speicherstick fuer spaeteren Geraetetausch einstecken." />
+          <Text TextId="gPxtId_95" Value="Warten auf Eingangssignal - Port 0" />
+          <Text TextId="gPxtId_96" Value="Eingang testen  - Port 0" />
+          <Text TextId="gPxtId_97" Value="Fehler am Eingang - Port 0" />
+          <Text TextId="gPxtId_98" Value="Querschluss Kanal 0 - Port 0" />
+          <Text TextId="gPxtId_99" Value="Querschluss Kanal 1 - Port 0" />
+          <Text TextId="gTId_276" Value="Feldbus-Konfiguration" />
+          <Text TextId="gTId_393_47" Value="Alle Diagnosen deaktivieren" />
+          <Text TextId="gTId_397_47" Value="I/O-ASS. Force Mode deaktivieren" />
+          <Text TextId="gTId_461_47" Value="Deaktiviere WEB Server" />
+          <Text TextId="gTId_462" Value="ja" />
+          <Text TextId="gTId_463" Value="nein" />
+          <Text TextId="gTId_510" Value="PROFINET-Konfiguration" />
+          <Text TextId="gTId_552" Value="Modulstatus" />
+          <Text TextId="gTId_559" Value="PROFIsafe" />
+          <Text TextId="gTId_560" Value="Safety-Status" />
+          <Text TextId="gTId_654" Value="Feldbus Bits" />
+        </Language>
+      </ExternalTextList>
+    </ApplicationProcess>
+  </ProfileBody>
+</ISO15745Profile>

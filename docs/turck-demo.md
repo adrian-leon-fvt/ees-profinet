@@ -144,6 +144,41 @@ Windows may show per-executable firewall prompts during UDP fixture checks.
 Do not grant Public-network access for these local tests. Follow corporate
 policy for any Private-network permissions needed on the dedicated bench NIC.
 
+### Networking findings (bench-verified)
+
+- **WSL drops unknown frames.** WSL2's virtual switch/NAT adapter does not
+  forward non-IP EtherTypes (PROFINET `0x8892`, DCP multicast), so raw
+  layer-2 discovery from WSL never sees the device. Run discovery natively on
+  Windows with Npcap, or on a real Linux host.
+- **Device replies from a different UDP port.** The request goes to port
+  34964, but the TBPN replies from an ephemeral port (observed 49152). Windows
+  Defender Firewall does not treat that as a response to the outbound request,
+  so the reply is dropped as unsolicited inbound UDP. Both `--status` and the
+  external `profinet` controller then report a timeout/"No response" although
+  Wireshark shows the device answered in about 2 ms.
+- **Fix:** add a Private-profile-only inbound UDP allow rule for the program
+  that owns the socket (admin PowerShell). Never use Public.
+  `uv tool` launchers such as `profinet.exe` are shims; the rule must target the
+  real interpreter, e.g. `%APPDATA%\uv\tools\<tool>\Scripts\python.exe`.
+
+  ```powershell
+  New-NetFirewallRule -DisplayName pn_turck_demo -Program <path>\pn_turck_demo.exe `
+    -Direction Inbound -Action Allow -Profile Private -Protocol UDP
+  ```
+
+- Check the NIC is Private: `Get-NetConnectionProfile -InterfaceIndex <n>`.
+- Diagnose with a passive capture:
+  `dumpcap -i 'Ethernet 4' -a duration:20 -f 'host <ip>' -w turck.pcapng`, then
+  `tshark -r turck.pcapng -Y udp -T fields -e ip.src -e udp.srcport -e ip.dst -e udp.dstport`.
+  A reply that appears in the capture but not in the program is a host
+  firewall drop, not a device problem.
+- With the rule in place, `--status` reaches the device. Slots 1-4 return
+  PNIO status `07 B2 80 DE` as printed (ErrorCode `DE`, Decode `80`, Code1 `B2`
+  invalid slot/subslot): the slots don't exist outside an AR, so live inputs
+  need a controller connection.
+- `--records <ip>` dumps raw ReadImplicit replies for `0xF000` and `0xF842`
+  (slot 0 / subslot 0) to inspect what the device exposes without an AR.
+
 ## Where PROFIsafe data would go
 
 This is the next integration boundary, **not implemented by the discovery demo**:

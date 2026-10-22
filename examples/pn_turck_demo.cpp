@@ -90,15 +90,20 @@ struct InputSnapshot
     std::vector<std::uint8_t> data;
 };
 
-std::vector<std::uint8_t> read_request(const std::uint16_t slot)
+std::vector<std::uint8_t> read_request(
+    const std::uint16_t slot,
+    const std::uint16_t subslot = 1,
+    const std::uint16_t index = k_input_record)
 {
     // IODReadReqHeader: zero ARUUID and TargetARUUID for ReadImplicit.
     std::vector<std::uint8_t> content(58, 0);
     content[1] = static_cast<std::uint8_t>(slot); // SequenceNumber
+    content[22] = static_cast<std::uint8_t>(slot >> 8);
     content[23] = static_cast<std::uint8_t>(slot);
-    content[25] = 1; // Subslot 1, API 0.
-    content[28] = static_cast<std::uint8_t>(k_input_record >> 8);
-    content[29] = static_cast<std::uint8_t>(k_input_record);
+    content[24] = static_cast<std::uint8_t>(subslot >> 8);
+    content[25] = static_cast<std::uint8_t>(subslot); // API 0.
+    content[28] = static_cast<std::uint8_t>(index >> 8);
+    content[29] = static_cast<std::uint8_t>(index);
     content[32] = 2; // RecordDataLength = 512.
     std::vector<std::uint8_t> args;
     pn::append_block(args, pn::pnio_block::k_iod_read_req_header, content);
@@ -314,6 +319,77 @@ void print_snapshot(const std::uint16_t slot, const InputSnapshot &snapshot)
     }
 }
 
+// Dumps the raw ReadImplicit response for one record; no interpretation.
+void dump_record(
+    const pn::Ipv4Endpoint &device,
+    const std::uint16_t slot,
+    const std::uint16_t subslot,
+    const std::uint16_t index)
+{
+    pn::RpcEndpoint endpoint(0);
+    pn::RpcHeader request;
+    request.object =
+        pn::make_pnio_object_uuid(1, k_tbpn_device, k_turck_vendor);
+    request.interface = pn::rpc_interface::k_device;
+    request.opnum = pn::pnio_opnum::k_read_implicit;
+    request.sequence = index;
+    std::random_device random;
+    for (auto &byte : request.activity)
+    {
+        byte = static_cast<std::uint8_t>(random());
+    }
+    bool done = false;
+    endpoint.on(
+        request.opnum,
+        [&](const pn::RpcPacket &packet, const pn::Ipv4Endpoint &from) {
+            if (from.ip != device.ip ||
+                packet.header.activity != request.activity)
+            {
+                return;
+            }
+            done = true;
+            const auto response = pn::parse_ndr_response(packet);
+            if (!response)
+            {
+                std::puts("  invalid NDR response");
+                return;
+            }
+            std::printf(
+                "  PNIO status %02X %02X %02X %02X\n",
+                response->status[0],
+                response->status[1],
+                response->status[2],
+                response->status[3]);
+            print_bytes("  Raw args:", response->args);
+        });
+    endpoint.send(device, request, read_request(slot, subslot, index));
+    const auto deadline =
+        std::chrono::steady_clock::now() + std::chrono::seconds(2);
+    while (!done && std::chrono::steady_clock::now() < deadline)
+    {
+        endpoint.poll(100);
+    }
+    if (!done)
+    {
+        std::puts("  timed out");
+    }
+}
+
+int show_records(const char *ip)
+{
+    pn::Ipv4Endpoint device;
+    if (::inet_pton(AF_INET, ip, device.ip.data()) != 1)
+    {
+        throw std::invalid_argument("--records requires a numeric IPv4 address");
+    }
+    for (const std::uint16_t index : {0xF000, 0xF842})
+    {
+        std::printf("Record 0x%04X (slot 0 / subslot 0):\n", index);
+        dump_record(device, 0, 0, index);
+    }
+    return 0;
+}
+
 int show_status(const char *ip)
 {
     pn::Ipv4Endpoint device;
@@ -431,6 +507,10 @@ int main(const int argc, char **argv)
         {
             return show_status(argv[2]);
         }
+        if (argc == 3 && std::string(argv[1]) == "--records")
+        {
+            return show_records(argv[2]);
+        }
 #ifdef PROFINET_NPCAP
         if (argc == 2 && std::string(argv[1]) == "--list")
         {
@@ -442,7 +522,7 @@ int main(const int argc, char **argv)
         {
             std::fprintf(
                 stderr,
-                "usage: %s <interface> | --status <ip> | --self-test"
+                "usage: %s <interface> | --status <ip> | --records <ip> | --self-test"
 #ifdef PROFINET_NPCAP
                 " | --list"
 #endif
